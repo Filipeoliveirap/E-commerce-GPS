@@ -1,0 +1,94 @@
+# ------------------------------
+# Build Java e arquivos compilados
+# ------------------------------
+*.class
+*.jar
+*.war
+*.ear
+target/
+out/
+build/
+
+# Para Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Para Maven
+.mvn/wrapper/maven-wrapper.jar
+dependency-reduced-pom.xml
+buildNumber.properties
+release.properties
+
+# Ignorar builds dentro de src
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ------------------------------
+# IDEs
+# ------------------------------
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.springBeans
+.apt_generated
+.factorypath
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VSCode
+.vscode/
+
+# ------------------------------
+# Logs e arquivos temporários
+# ------------------------------
+*.log
+hs_err_pid*
+*.tmp
+*.swp
+
+# ------------------------------
+# Configurações sensíveis
+# ------------------------------
+application.properties
+application.yml
+.env
+*.keystore
+*.jks
+*.p12
+
+# ------------------------------
+# Sistema Operacional
+# ------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Mac
+.DS_Store
+
+# ------------------------------
+# MongoDB / arquivos de dump locais
+# ------------------------------
+*.bson
+*.json
+
+# ------------------------------
+# Outros
+# ------------------------------
+HELP.md
