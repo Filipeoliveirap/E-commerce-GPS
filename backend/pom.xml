@@ -12,7 +12,7 @@
 	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>backend</name>
-	<description>backend do projeto do ecommer da disciplina de GPS</description>
+	<description>backend do projeto ecommerce da disciplina de GPS</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -93,6 +93,11 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>1.5.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>4.4.0</version>
         </dependency>
 	</dependencies>
 
