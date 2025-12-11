@@ -8,10 +8,12 @@ import com.backend.business.mappers.UserMapper;
 import com.backend.infrastructure.model.User;
 import com.backend.infrastructure.repository.UserRepository;
 import com.backend.infrastructure.security.TokenService;
+import com.backend.shared.exceptions.LoginException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +42,7 @@ public class UserService {
 
     //Metodo de lógica para registro de usuário
     public RegisterResponseDTO register (RegisterRequestDTO dto ) {
-        if (repository.findByEmail(dto.getEmail()) !=null) {
+        if (repository.findByEmail(dto.getEmail()) != null) {
             throw new IllegalArgumentException("Email ja cadastrado");
         }
 
@@ -59,19 +61,28 @@ public class UserService {
 
     //Metodo de lógica para login de usuário
     public LoginResponseDTO login(AuthenticationDTO dto) {
-        var userNamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
+        try {
+            var authToken =  new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
 
-        var auth = authenticationManager.authenticate(userNamePassword);
+            var auth = authenticationManager.authenticate(authToken);
 
-        var user = (User) auth.getPrincipal();
+            var user = (User) auth.getPrincipal();
 
-        var token = tokenService.generateToken(user);
+            var token = tokenService.generateToken(user);
 
-        return new LoginResponseDTO(
-                user.getId(),
-                user.getName(),
-                token
-        );
+            return new LoginResponseDTO(
+                    user.getId(),
+                    user.getName(),
+                    token
+            );
+
+        } catch (Exception e) {
+            throw new LoginException("Email ou senha inválidos");
+        }
+
+
+
+
     }
 
 }

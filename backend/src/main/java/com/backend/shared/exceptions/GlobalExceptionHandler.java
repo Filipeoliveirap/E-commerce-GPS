@@ -1,8 +1,7 @@
-package com.backend.shared.exception;
+package com.backend.shared.exceptions;
 
 import com.backend.shared.dtoerror.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -120,4 +119,19 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
+
+    // 5) tratamento de erro do login
+    @ExceptionHandler(LoginException.class)
+    public ResponseEntity<ErrorResponse> handleLoginException(LoginException ex, HttpServletRequest request) {
+        ErrorResponse body = new ErrorResponse(
+                OffsetDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Authentication Failed",
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
 }
