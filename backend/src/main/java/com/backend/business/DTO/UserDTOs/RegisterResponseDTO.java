@@ -11,4 +11,6 @@ public class RegisterResponseDTO {
     private String id;
     private String name;
     private String email;
+    private String telephone;
+    private String cpf;
 }

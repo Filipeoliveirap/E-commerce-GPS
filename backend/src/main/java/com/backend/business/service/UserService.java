@@ -9,6 +9,7 @@ import com.backend.infrastructure.model.User;
 import com.backend.infrastructure.repository.UserRepository;
 import com.backend.infrastructure.security.TokenService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,40 +19,45 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository repository;
+    @Autowired
+    private UserRepository repository;
 
-    private final UserMapper userMapper;
+    @Autowired
+    private UserMapper userMapper;
 
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    private final AuthenticationManager authenticationManager;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    private final TokenService tokenService;
+    @Autowired
+    private TokenService tokenService;
 
     public void saveUser(User user) {
         repository.save(user);
     }
 
+    //Metodo de lógica para registro de usuário
     public RegisterResponseDTO register (RegisterRequestDTO dto ) {
-        if(repository.findByEmail(dto.getEmail()) !=null) {
-            throw new IllegalArgumentException("Email already registered");
+        if (repository.findByEmail(dto.getEmail()) !=null) {
+            throw new IllegalArgumentException("Email ja cadastrado");
+        }
+
+        if (repository.findBycpf(dto.getCpf()).isPresent()) {
+            throw new IllegalArgumentException("CPF ja cadastrado");
         }
 
         User user = userMapper.toEntity(dto);
-
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         repository.save(user);
 
-        return new RegisterResponseDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail()
-
-        );
+        return userMapper.toResponse(user);
 
     }
 
+    //Metodo de lógica para login de usuário
     public LoginResponseDTO login(AuthenticationDTO dto) {
         var userNamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
 

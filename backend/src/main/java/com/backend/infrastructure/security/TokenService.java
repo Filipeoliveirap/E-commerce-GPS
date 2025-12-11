@@ -17,6 +17,7 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+    //metodo que gera o token
     public String generateToken(User user){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -31,6 +32,7 @@ public class TokenService {
         }
     }
 
+    //metodo que valida o token
     public String validateToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -46,7 +48,7 @@ public class TokenService {
 
     }
 
-
+    //metodo que gera a data de expiracao
     public Instant genExpirationDate() {
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }

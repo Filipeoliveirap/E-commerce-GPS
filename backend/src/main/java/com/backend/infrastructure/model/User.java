@@ -24,14 +24,19 @@ public class User implements UserDetails {
     private String name;
     private String email;
     private String password;
-    private String CPF;
-    private Address address;
+    private String cpf;
+    private String telephone;
     private UserRole role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if(this.role == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
         else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return "";
     }
 
     @Override
