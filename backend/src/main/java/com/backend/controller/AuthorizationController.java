@@ -7,6 +7,7 @@ import com.backend.business.DTO.UserDTOs.RegisterResponseDTO;
 import com.backend.business.service.UserService;
 import com.backend.infrastructure.repository.UserRepository;
 import com.backend.infrastructure.security.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,24 @@ public class AuthorizationController {
         RegisterResponseDTO response = userService.register(data);
         return ResponseEntity.ok(response);
 
+    }
+
+    //método para logout
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String token = extractToken(request);
+        if (token != null) {
+            tokenService.invalidateToken(token);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
     }
 
 
