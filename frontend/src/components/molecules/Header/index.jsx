@@ -1,64 +1,67 @@
-import { useState, useEffect, useRef } from 'react'
-import Icon from '../../atoms/Icon'
-import Button from '../../atoms/Button'
-import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect, useRef } from "react";
+import Icon from "../../atoms/Icon";
+import Button from "../../atoms/Button";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../../hook/useAuth";
+import { useTheme } from "../../../hook/useTheme";
 
 export default function Header({ hideOnScroll = true }) {
-  const [hideHeader, setHideHeader] = useState(false)
-  const [lastScrollY, setLastScrollY] = useState(0)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [cartCount, setCartCount] = useState(0)
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const location = useLocation()
+  const [hideHeader, setHideHeader] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cartCount, setCartCount] = useState(0);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const location = useLocation();
+  const { user } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   useEffect(() => {
-    if (!hideOnScroll) return
+    if (!hideOnScroll) return;
 
     const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      setHideHeader(currentScrollY > lastScrollY && currentScrollY > 50)
-      setLastScrollY(currentScrollY)
-    }
+      const currentScrollY = window.scrollY;
+      setHideHeader(currentScrollY > lastScrollY && currentScrollY > 50);
+      setLastScrollY(currentScrollY);
+    };
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY, hideOnScroll])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY, hideOnScroll]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user')
-    setSettingsOpen(false)
-    window.location.href = '/login'
-  }
-
-  const settingsBtnRef = useRef(null)
-  const settingsDropdownRef = useRef(null)
+  const settingsBtnRef = useRef(null);
+  const settingsDropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (!settingsOpen) return
+      if (!settingsOpen) return;
       if (
-        settingsBtnRef.current && !settingsBtnRef.current.contains(e.target) &&
-        settingsDropdownRef.current && !settingsDropdownRef.current.contains(e.target)
+        settingsBtnRef.current &&
+        !settingsBtnRef.current.contains(e.target) &&
+        settingsDropdownRef.current &&
+        !settingsDropdownRef.current.contains(e.target)
       ) {
-        setSettingsOpen(false)
+        setSettingsOpen(false);
       }
-    }
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [settingsOpen])
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [settingsOpen]);
 
   return (
     <header
       className={`
         w-full bg-white dark:bg-navy-800 shadow-sm border-b border-gray-100 dark:border-navy-700
         sticky top-0 z-50 transition-transform duration-300
-        ${hideHeader ? '-translate-y-full' : 'translate-y-0'}
+        ${hideHeader ? "-translate-y-full" : "translate-y-0"}
       `}
     >
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-4">
         {/* Logo */}
         <div>
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <Link
+            to="/"
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
             <div className="flex items-center justify-center size-10 rounded-full bg-primary/20 text-navy-900 dark:text-primary">
               <Icon name="devices" size="lg" />
             </div>
@@ -75,35 +78,56 @@ export default function Header({ hideOnScroll = true }) {
 
         {/* Search Bar */}
         <div className="hidden md:block flex-1 max-w-md mx-4 relative">
-            <input
-              type="text"
-              placeholder="Buscar produtos..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-gray-100 dark:bg-navy-900 border-none focus:ring-2 focus:ring-primary text-sm text-navy-900 dark:text-white placeholder-gray-400 outline-none transition-shadow"
-            />
-            <Icon name="search" size="md" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Buscar produtos..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-full bg-gray-100 dark:bg-navy-900 border-none focus:ring-2 focus:ring-primary text-sm text-navy-900 dark:text-white placeholder-gray-400 outline-none transition-shadow"
+          />
+          <Icon
+            name="search"
+            size="md"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
         </div>
 
         {/* Navigation */}
         <nav className="hidden lg:flex items-center gap-6">
-          <Link to="/" className="text-sm font-bold text-primary hover:text-yellow-600 transition-colors">
+          <Link
+            to="/"
+            className="text-sm font-bold text-primary hover:text-yellow-600 transition-colors"
+          >
             Home
           </Link>
-          <Link to="/produtos" className="text-sm font-medium text-navy-700 dark:text-gray-300 hover:text-navy-900 dark:hover:text-white transition-colors">
+          <Link
+            to="/produtos"
+            className="text-sm font-medium text-navy-700 dark:text-gray-300 hover:text-navy-900 dark:hover:text-white transition-colors"
+          >
             Produtos
           </Link>
-          <a href="#" className="text-sm font-medium text-navy-700 dark:text-gray-300 hover:text-navy-900 dark:hover:text-white transition-colors cursor-not-allowed opacity-50">
+          <a
+            href="#"
+            className="text-sm font-medium text-navy-700 dark:text-gray-300 hover:text-navy-900 dark:hover:text-white transition-colors cursor-not-allowed opacity-50"
+          >
             Computadores
           </a>
-          <a href="#" className="text-sm font-medium text-navy-700 dark:text-gray-300 hover:text-navy-900 dark:hover:text-white transition-colors cursor-not-allowed opacity-50">
+          <a
+            href="#"
+            className="text-sm font-medium text-navy-700 dark:text-gray-300 hover:text-navy-900 dark:hover:text-white transition-colors cursor-not-allowed opacity-50"
+          >
             Acessórios
           </a>
         </nav>
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="md" icon="shopping_cart" className="relative text-navy-900 dark:text-white">
+          <Button
+            variant="ghost"
+            size="md"
+            icon="shopping_cart"
+            className="relative text-navy-900 dark:text-white"
+          >
             {cartCount > 0 && (
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white dark:border-navy-800"></span>
             )}
@@ -112,7 +136,7 @@ export default function Header({ hideOnScroll = true }) {
           {/* Settings Dropdown */}
           <div className="relative settings-dropdown" ref={settingsDropdownRef}>
             <div ref={settingsBtnRef} className="inline-block">
-              <Button 
+              <Button
                 variant="ghost"
                 size="md"
                 icon="settings"
@@ -124,28 +148,65 @@ export default function Header({ hideOnScroll = true }) {
             {settingsOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-navy-800 border border-gray-200 dark:border-navy-700 rounded shadow-xl overflow-hidden z-50">
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-navy-700">
-                  <p className="text-xs font-semibold text-navy-900 dark:text-gray-300 uppercase tracking-wide">Minha Conta</p>
+                  <p className="text-xs font-semibold text-navy-900 dark:text-gray-300 uppercase tracking-wide">
+                    Minha Conta
+                  </p>
                 </div>
                 <ul className="divide-y divide-gray-200 dark:divide-navy-700">
                   <li>
-                    <a href="#" className="block px-4 py-2.5 text-sm text-navy-900 dark:text-white hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors">
+                    <a
+                      href="#"
+                      className="block px-4 py-2.5 text-sm text-navy-900 dark:text-white hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
+                    >
                       Perfil
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="block px-4 py-2.5 text-sm text-navy-900 dark:text-white hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors">
+                    <a
+                      href="#"
+                      className="block px-4 py-2.5 text-sm text-navy-900 dark:text-white hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
+                    >
                       Meus Pedidos
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="block px-4 py-2.5 text-sm text-navy-900 dark:text-white hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors">
+                    <a
+                      href="#"
+                      className="block px-4 py-2.5 text-sm text-navy-900 dark:text-white hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
+                    >
                       Endereços
                     </a>
                   </li>
+                  <li className="px-4 py-2 flex items-center justify-between">
+                    <span className="text-sm text-navy-900 dark:text-gray-300">
+                      Modo Escuro
+                    </span>
+
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={darkMode}
+                        onChange={toggleDarkMode}
+                        className="sr-only"
+                      />
+                      <div className="w-10 h-6 bg-gray-300 dark:bg-gray-600 rounded-full shadow-inner transition-colors duration-300"></div>
+                      <div
+                        className={`absolute left-0 top-0 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                          darkMode ? "translate-x-4" : "translate-x-0"
+                        }`}
+                      ></div>
+                    </label>
+                  </li>
                 </ul>
+                {/*  Logout:
+              - A lógica de logout (limpar token, user, redirecionamento)
+              - DEVE ser implementada dentro do hook useAuth
+              - O Header apenas dispara a ação */}
                 <div className="border-t border-gray-200 dark:border-navy-700">
                   <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                      /* TODO: implementar logout */
+                    }}
                     className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-navy-700 transition-colors flex items-center gap-2"
                   >
                     <Icon name="logout" size="sm" />
@@ -156,22 +217,37 @@ export default function Header({ hideOnScroll = true }) {
             )}
           </div>
 
-          {location.pathname === '/login' ? (
-            <Link to="/cadastro" className="hidden md:block">
-              <Button variant="secondary" size="md">
-                Criar Conta
-              </Button>
-            </Link>
-          ) : (
-            <Link to="/login" className="hidden md:block">
-              <Button variant="secondary" size="md">
-                Login
-              </Button>
-            </Link>
+          {/* USUÁRIO NÃO LOGADO */}
+          {!user && (
+            <>
+              {location.pathname !== "/login" && (
+                <Link to="/login" className="hidden md:block">
+                  <Button variant="secondary" size="md">
+                    Login
+                  </Button>
+                </Link>
+              )}
+
+              {location.pathname !== "/cadastro" && (
+                <Link to="/cadastro" className="hidden md:block">
+                  <Button variant="secondary" size="md">
+                    Criar Conta
+                  </Button>
+                </Link>
+              )}
+            </>
           )}
+
+          {/* Saudação do usuário */}
+          {user && (
+            <span className="hidden md:block text-sm text-navy-900 dark:text-white">
+              Olá, <strong>{user.name.split(" ")[0]}</strong>
+            </span>
+          )}
+
           <Button variant="ghost" size="md" icon="menu" className="md:hidden" />
         </div>
       </div>
     </header>
-  )
+  );
 }

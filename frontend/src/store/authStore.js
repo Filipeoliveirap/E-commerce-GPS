@@ -1,10 +1,16 @@
 import {create} from "zustand";
+import { storage } from "../service/storageService";
 
 export const useAuthStore = create((set) => ({
-    user: null,
-    token: null,
-    isAuthenticated: false,
+    user: storage.getUser(),
+    token: storage.getToken(),
+    isAuthenticated: !!storage.getToken(),
     
-    login: (user, token) => set({ user, token, isAuthenticated: true })
+    login(user, token) { 
+        storage.setAuth(token, user);
+        set({ user, token, isAuthenticated: true }); 
+    },
+
+    //implementar logout aqui
     
 }));
