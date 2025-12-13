@@ -1,0 +1,258 @@
+import { useState } from 'react'
+import { cpf } from 'cpf-cnpj-validator'
+import { formatCPF, formatPhone } from '../../../utils/formatters'
+import { validateEmail, validateCPF, validatePhone as validatePhoneUtil, validatePassword } from '../../../utils/validators'
+import { Link } from 'react-router-dom'
+import Input from '../../atoms/Input'
+import Button from '../../atoms/Button'
+import Checkbox from '../../atoms/Checkbox'
+
+export default function CadastroForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    cpf: '',
+    password: '',
+    telefone: '',
+    terms: false
+  })
+
+  const [errors, setErrors] = useState({})
+  const [showPassword, setShowPassword] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleInputChange = (e) => {
+    let { name, value, type, checked } = e.target
+
+    if (name === 'cpf') {
+      value = formatCPF(value)
+    } else if (name === 'telefone') {
+      value = formatPhone(value)
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }))
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const newErrors = {}
+
+    if (!formData.name.trim()) newErrors.name = 'Nome obrigatório'
+    if (!formData.email.trim()) newErrors.email = 'E-mail obrigatório'
+    else if (!validateEmail(formData.email)) newErrors.email = 'E-mail inválido'
+
+    if (!formData.cpf.trim()) newErrors.cpf = 'CPF obrigatório'
+    else if (!validateCPF(formData.cpf)) newErrors.cpf = 'CPF inválido'
+
+    if (!formData.password) newErrors.password = 'Senha obrigatória'
+    else if (!validatePassword(formData.password)) newErrors.password = 'Mínimo 6 caracteres'
+
+    if (!formData.telefone.trim()) newErrors.telefone = 'Telefone obrigatório'
+    else if (!validatePhoneUtil(formData.telefone)) newErrors.telefone = 'Telefone inválido'
+
+    if (!formData.terms) newErrors.terms = 'Aceite os termos'
+
+    setErrors(newErrors)
+
+    if (Object.keys(newErrors).length === 0) {
+      setLoading(true)
+      try {
+        const response = await fetch('http://localhost:8080/user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.message || `Erro ao cadastrar (${response.status})`)
+        }
+
+        setSuccessMessage('Cadastro realizado com sucesso!')
+        setTimeout(() => {
+          setFormData({
+            name: '',
+            email: '',
+            cpf: '',
+            password: '',
+            telefone: '',
+            terms: false
+          })
+          setSuccessMessage('')
+        }, 2000)
+      } catch (error) {
+        console.error('Erro no cadastro:', error)
+        setErrors({ submit: error.message || 'Erro ao conectar com o servidor. Tente novamente.' })
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="mb-8">
+        <h3 className="text-2xl font-bold text-navy-900 dark:text-white mb-2">Criar conta A.J.F.</h3>
+        <p className="text-navy-700 dark:text-gray-400 text-sm">Preencha seus dados para acessar nossa loja de eletrônicos.</p>
+      </div>
+
+      {/* Nome */}
+      <Input
+        label="Nome Completo"
+        icon="person"
+        name="name"
+        type="text"
+        placeholder="Digite seu nome completo"
+        value={formData.name}
+        onChange={handleInputChange}
+        error={errors.name}
+        required
+      />
+
+      {/* Email e CPF */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <Input
+            label="E-mail"
+            icon="alternate_email"
+            name="email"
+            type="email"
+            placeholder="seu@email.com"
+            value={formData.email}
+            onChange={handleInputChange}
+            error={errors.email}
+            required
+          />
+        </div>
+
+        <div>
+          <Input
+            label="CPF"
+            icon="credit_card"
+            name="cpf"
+            type="text"
+            placeholder="000.000.000-00"
+            value={formData.cpf}
+            onChange={handleInputChange}
+            error={errors.cpf}
+            maxLength={14}
+            required
+          />
+        </div>
+      </div>
+
+      {/* Telefone */}
+      <Input
+        label="Telefone"
+        icon="call"
+        name="telefone"
+        type="tel"
+        placeholder="(00) 90000-0000"
+        value={formData.telefone}
+        onChange={handleInputChange}
+        error={errors.telefone}
+        maxLength={15}
+        required
+      />
+
+      {/* Senha */}
+      <Input
+        label="Senha"
+        icon="lock_open"
+        name="password"
+        placeholder="Crie uma senha segura"
+        type={showPassword ? 'text' : 'password'}
+        value={formData.password}
+        onChange={handleInputChange}
+        error={errors.password}
+        trailing={(
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="flex items-center cursor-pointer"
+            aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
+          >
+            <span className="material-symbols-outlined text-gray-400 hover:text-navy-700 dark:hover:text-gray-200 text-[20px]">
+              {showPassword ? 'visibility_off' : 'visibility'}
+            </span>
+          </button>
+        )}
+      />
+
+      {/* Terms */}
+      <div className="flex items-center pt-2">
+        <Checkbox
+          id="terms"
+          name="terms"
+          checked={formData.terms}
+          onChange={handleInputChange}
+        />
+        <label className="ml-2 block text-xs text-navy-700 dark:text-gray-400">
+          Concordo com os{' '}
+          <a href="#" className="font-medium text-navy-900 dark:text-primary hover:underline">
+            Termos da A.J.F.
+          </a>
+          {' '}e{' '}
+          <a href="#" className="font-medium text-navy-900 dark:text-primary hover:underline">
+            Política de Privacidade
+          </a>
+          .
+        </label>
+      </div>
+      {errors.terms && <p className="text-red-500 text-xs">{errors.terms}</p>}
+
+      {/* Submit Button */}
+      <div className="mt-6">
+        <Button
+          type="submit"
+          disabled={loading}
+          variant="primary"
+          size="md"
+          className="group relative flex w-full justify-center"
+        >
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+            <span className="material-symbols-outlined h-5 w-5 text-navy-900/60 group-hover:text-navy-900 transition-colors">
+              shopping_cart_checkout
+            </span>
+          </span>
+          {loading ? 'Cadastrando...' : 'Finalizar Cadastro'}
+        </Button>
+      </div>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="mt-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-full text-green-700 dark:text-green-400 text-sm text-center">
+          ✓ {successMessage}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {errors.submit && (
+        <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-full text-red-700 dark:text-red-400 text-sm text-center flex items-center justify-center gap-2">
+          <span className="material-symbols-outlined text-base">error</span>
+          {errors.submit}
+        </div>
+      )}
+
+      {/* Login Link */}
+      <div className="mt-6 text-center">
+        <p className="text-xs text-navy-700 dark:text-gray-400">
+          Já tem conta na A.J.F.?{' '}
+          <Link to="/login" className="font-bold text-navy-900 dark:text-white hover:text-primary dark:hover:text-primary transition-colors">
+            Fazer Login
+          </Link>
+        </p>
+      </div>
+    </form>
+  )
+}
