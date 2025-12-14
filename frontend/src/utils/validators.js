@@ -1,5 +1,4 @@
-// src/utils/validators.js
-import { cpf as cpfValidator } from "cpf-cnpj-validator";
+//import { cpf as cpfValidator } from "cpf-cnpj-validator";
 
 /**
  * Valida se o email tem formato correto.
@@ -8,18 +7,35 @@ import { cpf as cpfValidator } from "cpf-cnpj-validator";
  */
 export const validateEmail = (email) => {
   if (!email) return false;
+
+  // Regex básico para formato
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return emailRegex.test(email);
+  if (!emailRegex.test(email)) return false;
+
+  // Lista de domínios válidos mais comuns
+  const validDomains = ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com"];
+  const domain = email.split("@")[1].toLowerCase();
+
+  return validDomains.includes(domain);
 };
+
 /**
- * Valida CPF usando a biblioteca cpf-cnpj-validator
- * @param {string} cpfValue - CPF com ou sem pontuação
- * @returns {boolean} true se válido, false caso contrário
+ * Validação completa de CPF (para usar depois)
+ */
+// export const validateCPF = (cpfValue) => {
+//   if (!cpfValue) return false;
+//   const cpfClean = cpfValue.replace(/\D/g, ""); // remove caracteres não numéricos
+//   return cpfValidator.isValid(cpfClean);
+// };
+
+/**
+ * Validação simplificada de CPF (produção temporária)
+ * Apenas verifica se tem 11 dígitos numéricos
  */
 export const validateCPF = (cpfValue) => {
   if (!cpfValue) return false;
-  const cpfClean = cpfValue.replace(/\D/g, ""); // remove caracteres não numéricos
-  return cpfValidator.isValid(cpfClean);
+  const cpfClean = cpfValue.replace(/\D/g, "");
+  return cpfClean.length === 11;
 };
 
 /**

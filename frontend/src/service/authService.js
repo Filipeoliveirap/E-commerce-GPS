@@ -13,3 +13,16 @@ export async function loginUser(data) {
     }
   }
 }
+
+export async function registerUser(data) {
+  try {
+    const response = await api.post(UsersEndpoit.REGISTER, data);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message || "Erro ao realizar cadastro.");
+    } else {
+      throw new Error("Erro de conexão com o servidor.");
+    }
+  }
+}

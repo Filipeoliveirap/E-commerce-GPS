@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { loginUser } from "../service/authService";
+import { loginUser, registerUser } from "../service/authService";
 import { useAuthStore } from "../store/authStore";
 
 export function useAuth() {
@@ -15,8 +15,8 @@ export function useAuth() {
 
       const { token, name } = await loginUser({ email, password });
       const firstName = name.split(" ")[0];
-      
-      login({ name }, token); 
+
+      login({ name }, token);
       toast.success(`Bem-vindo de volta, ${firstName}!`);
       return true;
     } catch (err) {
@@ -27,5 +27,34 @@ export function useAuth() {
     }
   }
 
-  return { handleLogin, isAuthenticated, user, loading, error };
+  async function handleRegister(data) {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const payload = {
+        ...data,
+        cpf: data.cpf.replace(/\D/g, ""),
+        telephone: data.telefone.replace(/\D/g, ""),
+        role: "USER",
+      };
+
+      const response = await registerUser(payload);
+      const firstName = response.name.split(" ")[0];
+
+      toast.success(
+        `Bem-vindo(a), ${firstName}! Cadastro realizado com sucesso.`
+      );
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.message || "Erro ao cadastrar usuário",
+      };
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  return { handleLogin, handleRegister, isAuthenticated, user, loading, error };
 }
