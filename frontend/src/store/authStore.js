@@ -11,6 +11,9 @@ export const useAuthStore = create((set) => ({
         set({ user, token, isAuthenticated: true }); 
     },
 
-    //implementar logout aqui
+    logout() {
+        storage.clearAuth();
+        set({ user: null, token: null, isAuthenticated: false });
+    }
     
 }));

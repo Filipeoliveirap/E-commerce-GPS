@@ -2,12 +2,14 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { loginUser, registerUser } from "../service/authService";
 import { useAuthStore } from "../store/authStore";
+import { storage } from "../service/storageService";
+import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
-  const { login, isAuthenticated, user } = useAuthStore();
+  const { login, logout, isAuthenticated, user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
   async function handleLogin(email, password) {
     try {
       setLoading(true);
@@ -55,6 +57,15 @@ export function useAuth() {
       setLoading(false);
     }
   }
+
+  function handleLogout() {
+    storage.clearAuth();
+    logout();
+    toast.success("Deslogado com sucesso!");
+    navigate("/");
+  }
+
   
-  return { handleLogin, handleRegister, isAuthenticated, user, loading, error };
+  
+  return { handleLogin, handleRegister,  handleLogout, isAuthenticated, user, loading, error };
 }

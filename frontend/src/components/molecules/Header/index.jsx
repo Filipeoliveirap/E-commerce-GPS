@@ -14,6 +14,7 @@ export default function Header({ hideOnScroll = true }) {
   const location = useLocation();
   const { user } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
+  const { handleLogout } = useAuth();
 
   useEffect(() => {
     if (!hideOnScroll) return;
@@ -198,15 +199,10 @@ export default function Header({ hideOnScroll = true }) {
                     </label>
                   </li>
                 </ul>
-                {/*  Logout:
-              - A lógica de logout (limpar token, user, redirecionamento)
-              - DEVE ser implementada dentro do hook useAuth
-              - O Header apenas dispara a ação */}
+                {/* Sair da Conta/logout */}
                 <div className="border-t border-gray-200 dark:border-navy-700">
                   <button
-                    onClick={() => {
-                      /* TODO: implementar logout */
-                    }}
+                    onClick={() => { handleLogout();}}
                     className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-navy-700 transition-colors flex items-center gap-2"
                   >
                     <Icon name="logout" size="sm" />
