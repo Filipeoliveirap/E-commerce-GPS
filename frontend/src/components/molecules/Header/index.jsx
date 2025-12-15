@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import Icon from "../../atoms/Icon";
 import Button from "../../atoms/Button";
 import { Link, useLocation } from "react-router-dom";
@@ -200,15 +200,17 @@ export default function Header({ hideOnScroll = true }) {
                   </li>
                 </ul>
                 {/* Sair da Conta/logout */}
-                <div className="border-t border-gray-200 dark:border-navy-700">
-                  <button
-                    onClick={() => { handleLogout();}}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-navy-700 transition-colors flex items-center gap-2"
-                  >
-                    <Icon name="logout" size="sm" />
-                    Sair da Conta
-                  </button>
-                </div>
+                {user && (
+                  <div className="border-t border-gray-200 dark:border-navy-700">
+                    <button
+                      onClick={() => { handleLogout();}}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-navy-700 transition-colors flex items-center gap-2"
+                    >
+                      <Icon name="logout" size="sm" />
+                      Sair da Conta
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
