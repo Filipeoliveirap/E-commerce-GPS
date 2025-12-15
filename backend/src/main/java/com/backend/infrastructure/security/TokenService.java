@@ -17,6 +17,7 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+
     //metodo que gera o token
     public String generateToken(User user){
         try {
@@ -47,6 +48,7 @@ public class TokenService {
         }
 
     }
+
 
     //metodo que gera a data de expiracao
     public Instant genExpirationDate() {

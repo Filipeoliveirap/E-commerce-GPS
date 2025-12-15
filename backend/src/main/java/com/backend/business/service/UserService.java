@@ -71,7 +71,6 @@ public class UserService {
             var token = tokenService.generateToken(user);
 
             return new LoginResponseDTO(
-                    user.getId(),
                     user.getName(),
                     token
             );

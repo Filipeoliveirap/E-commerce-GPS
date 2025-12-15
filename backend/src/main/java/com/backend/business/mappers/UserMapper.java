@@ -24,11 +24,7 @@ public class UserMapper {
     //metodo que mapeia a entidade para dto(transforma a entidade em dto)
     public RegisterResponseDTO toResponse(User user) {
         return new RegisterResponseDTO(
-                user.getId(),
-                user.getName(),
-                MaskUtils.maskEmail(user.getEmail()),
-                MaskUtils.maskTelephone(user.getTelephone()),
-                MaskUtils.maskcpf(user.getCpf())
+                user.getName()
         );
     }
 
