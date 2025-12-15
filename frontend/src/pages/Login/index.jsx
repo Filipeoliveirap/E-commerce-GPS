@@ -5,7 +5,7 @@ import Input from "../../components/atoms/Input";
 import Button from "../../components/atoms/Button";
 import Checkbox from "../../components/atoms/Checkbox";
 import { validateEmail, validatePassword } from "../../utils/validators";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hook/useAuth";
 import { toast } from "react-toastify";
 
 export default function Login() {
