@@ -2,6 +2,7 @@ package com.backend.business.mappers;
 
 import com.backend.business.DTO.UserDTOs.RegisterRequestDTO;
 import com.backend.business.DTO.UserDTOs.RegisterResponseDTO;
+import com.backend.business.DTO.UserDTOs.UpdatePerfilResponseDTO;
 import com.backend.infrastructure.model.User;
 import com.backend.shared.utils.MaskUtils;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,16 @@ public class UserMapper {
         );
     }
 
+    public UpdatePerfilResponseDTO toUpdatePerfilResponse(User user) {
+        return UpdatePerfilResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(MaskUtils.maskEmail(user.getEmail()))
+                .cpf(MaskUtils.maskcpf(user.getCpf()))
+                .telephone(MaskUtils.maskTelephone(user.getTelephone()))
+                .Role(user.getRole().name())
+                .build();
+    }
 
 
 }
