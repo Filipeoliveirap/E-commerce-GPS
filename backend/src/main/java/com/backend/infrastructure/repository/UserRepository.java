@@ -2,7 +2,7 @@ package com.backend.infrastructure.repository;
 
 import com.backend.infrastructure.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.security.core.userdetails.UserDetails;
+
 
 import java.util.Optional;
 
