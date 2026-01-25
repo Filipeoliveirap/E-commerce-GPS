@@ -17,6 +17,6 @@ public class UpdatePerfilResponseDTO {
     private String password;
     private String cpf;
     private String telephone;
-    private String Role;
+    private String role;
 
 }
