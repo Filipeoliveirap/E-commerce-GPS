@@ -9,7 +9,6 @@ import com.backend.shared.exceptions.LoginException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ public class UserService {
 
     private final TokenService tokenService;
 
-    //Metodo de lógica para registro de usuário
+    // Metodo de lógica para registro de usuário
     public RegisterResponseDTO register(RegisterRequestDTO dto) {
 
         if (repository.findByEmail(dto.getEmail()).isPresent()) {
@@ -46,8 +45,7 @@ public class UserService {
         return userMapper.toResponse(user);
     }
 
-
-    //Metodo de lógica para login de usuário
+    // Metodo de lógica para login de usuário
     public LoginResponseDTO login(AuthenticationDTO dto) {
         try {
             var authToken = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
@@ -60,8 +58,7 @@ public class UserService {
 
             return new LoginResponseDTO(
                     user.getName(),
-                    token
-            );
+                    token);
 
         } catch (Exception e) {
             throw new LoginException("Email ou senha inválidos");
@@ -69,28 +66,47 @@ public class UserService {
 
     }
 
-    public UpdatePerfilResponseDTO updatePerfil(String emailUsuarioLogado, UpdatePerfilRequestDTO dto) {
+    public UserProfileResponseDTO updatePerfil(
+        String emailUsuarioLogado,
+        UpdatePerfilRequestDTO dto
+) {
+
+    User user = repository.findByEmail(emailUsuarioLogado)
+            .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+    if (dto.getName() != null) {
+        user.setName(dto.getName());
+    }
+
+    if (dto.getEmail() != null) {
+        user.setEmail(dto.getEmail());
+    }
+
+    if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+    }
+
+    if (dto.getTelephone() != null) {
+        user.setTelephone(dto.getTelephone());
+    }
+
+    if (dto.getCpf() != null) {
+        user.setCpf(dto.getCpf());
+    }
+
+    repository.save(user);
+
+    // retorno UNIFICADO
+    return userMapper.toProfileResponse(user);
+}
+
+    // metodo para buscar o obj usuario
+    public UserProfileResponseDTO getPerfil(String emailUsuarioLogado) {
+
         User user = repository.findByEmail(emailUsuarioLogado)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        if (dto.getName() != null) {
-            user.setName(dto.getName());
-        }
-        if (dto.getEmail() != null) {
-            user.setEmail(dto.getEmail());
-        }
-        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
-        if (dto.getTelephone() != null) {
-            user.setTelephone(dto.getTelephone());
-        }
-
-
-        repository.save(user);
-
-        return userMapper.toUpdatePerfilResponse(user);
+        return userMapper.toUserProfileResponse(user);
     }
-
 
 }
