@@ -1,8 +1,10 @@
 package com.backend.controller;
 
 import com.backend.business.DTO.UserDTOs.UpdatePerfilRequestDTO;
-import com.backend.business.DTO.UserDTOs.UpdatePerfilResponseDTO;
+import com.backend.business.DTO.UserDTOs.UserProfileResponseDTO;
 import com.backend.business.service.UserService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,16 +18,21 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping("/perfil")
-    public ResponseEntity<UpdatePerfilResponseDTO> updatePerfil(
+    public ResponseEntity<UserProfileResponseDTO> updatePerfil(
             Authentication authentication,
-            @RequestBody UpdatePerfilRequestDTO dto
-    ) {
+            @Valid @RequestBody UpdatePerfilRequestDTO dto) {
+        String emailUsuarioLogado = authentication.getName();
+        return ResponseEntity.ok(
+                userService.updatePerfil(emailUsuarioLogado, dto));
+    }
 
-        // Pega o email do usuário logado via token JWT
+    // metodo get para buscar o perfil do usuario logado
+    @GetMapping("/perfil")
+    public ResponseEntity<UserProfileResponseDTO> getPerfil(Authentication authentication) {
+
         String emailUsuarioLogado = authentication.getName();
 
-        UpdatePerfilResponseDTO response =
-                userService.updatePerfil(emailUsuarioLogado, dto);
+        UserProfileResponseDTO response = userService.getPerfil(emailUsuarioLogado);
 
         return ResponseEntity.ok(response);
     }
