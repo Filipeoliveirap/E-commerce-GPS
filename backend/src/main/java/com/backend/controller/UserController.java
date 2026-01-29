@@ -28,12 +28,10 @@ public class UserController {
 
     // metodo get para buscar o perfil do usuario logado
     @GetMapping("/perfil")
-    public ResponseEntity<UserProfileResponseDTO> getPerfil(Authentication authentication) {
-
+    public ResponseEntity<UserProfileResponseDTO> getPerfil(
+            Authentication authentication) {
         String emailUsuarioLogado = authentication.getName();
-
-        UserProfileResponseDTO response = userService.getPerfil(emailUsuarioLogado);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                userService.getPerfil(emailUsuarioLogado));
     }
 }
