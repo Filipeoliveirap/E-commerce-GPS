@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../Perfil/Perfil.css";
+import { storage } from "../../service/storageService";
 
 export default function PerfilUsuario() {
   const [perfil, setPerfil] = useState({
@@ -10,28 +11,65 @@ export default function PerfilUsuario() {
     role: ""
   });
 
-  const token = localStorage.getItem("token"); // JWT
+  const [novaSenha, setNovaSenha] = useState("");
+
+  const [editando, setEditando] = useState({
+    name: false,
+    telephone: false,
+    email: false,
+    cpf: false,
+    password: false
+  });
+
+  const [mostrar, setMostrar] = useState({
+    password: false
+  });
+
+  const token = storage.getToken();
+
+  const toggleEdit = (campo) => {
+    setEditando((prev) => ({
+      ...prev,
+      [campo]: !prev[campo]
+    }));
+  };
+
+  const toggleMostrar = (campo) => {
+    setMostrar((prev) => ({
+      ...prev,
+      [campo]: !prev[campo]
+    }));
+  };
 
   // 🔹 BUSCAR PERFIL
   useEffect(() => {
+    if (!token) return;
+
     fetch("http://localhost:8080/api/users/perfil", {
-      method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
+        Authorization: `Bearer ${token}`
       }
     })
-      .then(res => res.json())
-      .then(data => {
-        setPerfil(data);
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro ao buscar perfil");
+        return res.json();
       })
-      .catch(err => {
-        console.error("Erro ao buscar perfil:", err);
-      });
+      .then((data) => {
+        setPerfil({
+          name: data.name ?? "",
+          email: data.email ?? "",
+          cpf: data.cpf ?? "",
+          telephone: data.telephone ?? "",
+          role: data.role ?? ""
+        });
+      })
+      .catch(console.error);
   }, [token]);
 
-  // 🔹 ATUALIZAR PERFIL
+  // 🔹 SALVAR PERFIL Ainda precisa de alguns ajustes
   const handleSave = () => {
+    if (!token) return;
+
     fetch("http://localhost:8080/api/users/perfil", {
       method: "PUT",
       headers: {
@@ -40,16 +78,48 @@ export default function PerfilUsuario() {
       },
       body: JSON.stringify({
         name: perfil.name,
-        telephone: perfil.telephone
+        telephone: perfil.telephone,
+        email: perfil.email,
+        cpf: perfil.cpf
       })
     })
-      .then(res => res.json())
-      .then(() => {
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro ao atualizar perfil");
         alert("Perfil atualizado com sucesso!");
+        setEditando({
+          name: false,
+          telephone: false,
+          email: false,
+          cpf: false,
+          password: false
+        });
       })
-      .catch(err => {
-        console.error("Erro ao atualizar perfil:", err);
-      });
+      .catch(console.error);
+  };
+
+  // 🔹 SALVAR SENHA
+  const handleSaveSenha = () => {
+    if (!novaSenha) {
+      alert("Digite uma nova senha");
+      return;
+    }
+
+    fetch("http://localhost:8080/api/users/password", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ password: novaSenha })
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro ao alterar senha");
+        alert("Senha alterada com sucesso!");
+        setNovaSenha("");
+        setEditando((prev) => ({ ...prev, password: false }));
+        setMostrar((prev) => ({ ...prev, password: false }));
+      })
+      .catch(console.error);
   };
 
   return (
@@ -67,10 +137,7 @@ export default function PerfilUsuario() {
           <input className="search" placeholder="Buscar produtos..." />
 
           <div className="user-info">
-            <img
-              src="https://i.pravatar.cc/150"
-              alt="Perfil"
-            />
+            <img src="https://i.pravatar.cc/150" alt="Perfil" />
             <div>
               <p className="user-name">{perfil.name}</p>
               <span>Minha Conta</span>
@@ -94,50 +161,148 @@ export default function PerfilUsuario() {
           <div className="content-header">
             <div>
               <h1>Dados Pessoais</h1>
-              <p>Visualize e salve suas informações</p>
+              <p>Visualize e edite suas informações</p>
             </div>
 
             <button className="btn-save" onClick={handleSave}>
-              Salvar Informações
+              Salvar Alterações
             </button>
           </div>
 
           <form className="form">
-            <div className="form-group full">
+            {/* NOME */}
+            <div className="form-group">
               <label>Nome Completo</label>
-              <input
-                type="text"
-                value={perfil.name}
-                onChange={e =>
-                  setPerfil({ ...perfil, name: e.target.value })
-                }
-              />
+              <div className="input-edit-wrapper">
+                <input
+                  type="text"
+                  value={perfil.name}
+                  disabled={!editando.name}
+                  onChange={(e) =>
+                    setPerfil({ ...perfil, name: e.target.value })
+                  }
+                />
+                <button
+                  type="button"
+                  className="btn-edit"
+                  onClick={() => toggleEdit("name")}
+                >
+                  {editando.name ? "Salvar" : "Editar"}
+                </button>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Telefone</label>
-              <input
-                type="tel"
-                value={perfil.telephone}
-                onChange={e =>
-                  setPerfil({ ...perfil, telephone: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label>E-mail</label>
-              <input type="email" value={perfil.email} readOnly />
-            </div>
-
-            <div className="form-group">
-              <label>CPF</label>
-              <input type="text" value={perfil.cpf} readOnly />
-            </div>
-
+            {/* PERFIL */}
             <div className="form-group">
               <label>Perfil</label>
               <input type="text" value={perfil.role} readOnly />
+            </div>
+
+            {/* CPF */}
+            <div className="form-group">
+              <label>CPF</label>
+              <div className="input-edit-wrapper">
+                <input
+                  type="text"
+                  value={perfil.cpf}
+                  disabled={!editando.cpf}
+                  onChange={(e) =>
+                    setPerfil({ ...perfil, cpf: e.target.value })
+                  }
+                />
+                <button
+                  type="button"
+                  className="btn-edit"
+                  onClick={() => toggleEdit("cpf")}
+                >
+                  {editando.cpf ? "Salvar" : "Editar"}
+                </button>
+              </div>
+            </div>
+
+            {/* TELEFONE */}
+            <div className="form-group">
+              <label>Telefone</label>
+              <div className="input-edit-wrapper">
+                <input
+                  type="tel"
+                  value={perfil.telephone}
+                  disabled={!editando.telephone}
+                  onChange={(e) =>
+                    setPerfil({ ...perfil, telephone: e.target.value })
+                  }
+                />
+                <button
+                  type="button"
+                  className="btn-edit"
+                  onClick={() => toggleEdit("telephone")}
+                >
+                  {editando.telephone ? "Salvar" : "Editar"}
+                </button>
+              </div>
+            </div>
+
+            {/* EMAIL */}
+            <div className="form-group">
+              <label>E-mail</label>
+              <div className="input-edit-wrapper">
+                <input
+                  type="email"
+                  value={perfil.email}
+                  disabled={!editando.email}
+                  onChange={(e) =>
+                    setPerfil({ ...perfil, email: e.target.value })
+                  }
+                />
+                <button
+                  type="button"
+                  className="btn-edit"
+                  onClick={() => toggleEdit("email")}
+                >
+                  {editando.email ? "Salvar" : "Editar"}
+                </button>
+              </div>
+            </div>
+
+            {/* SENHA */}
+            <div className="form-group">
+              <label>Senha</label>
+              <div className="input-edit-wrapper">
+                <input
+                  type={mostrar.password ? "text" : "password"}
+                  value={editando.password ? novaSenha : "Senha atual"}
+                  disabled={!editando.password}
+                  placeholder="Digite uma nova senha"
+                  onChange={(e) => setNovaSenha(e.target.value)}
+                />
+
+                <button
+                  type="button"
+                  className="btn-edit"
+                  onClick={() => toggleMostrar("password")}
+                >
+                  {mostrar.password ? "Ocultar" : "Mostrar"}
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-edit"
+                  onClick={() => toggleEdit("password")}
+                >
+                  {editando.password ? "Cancelar" : "Editar"}
+                </button>
+              </div>
+
+              {editando.password && (
+                <button
+                  type="button"
+                  className="btn-save"
+                  style={{ marginTop: "10px" }}
+                  onClick={handleSaveSenha}
+                >
+                  Salvar Nova Senha
+                </button>
+              )}
             </div>
           </form>
         </section>
