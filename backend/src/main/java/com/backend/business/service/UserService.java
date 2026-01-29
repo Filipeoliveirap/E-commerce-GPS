@@ -67,44 +67,42 @@ public class UserService {
     }
 
     public UserProfileResponseDTO updatePerfil(
-        String emailUsuarioLogado,
-        UpdatePerfilRequestDTO dto
-) {
-
-    User user = repository.findByEmail(emailUsuarioLogado)
-            .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-
-    if (dto.getName() != null) {
-        user.setName(dto.getName());
-    }
-
-    if (dto.getEmail() != null) {
-        user.setEmail(dto.getEmail());
-    }
-
-    if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-    }
-
-    if (dto.getTelephone() != null) {
-        user.setTelephone(dto.getTelephone());
-    }
-
-    if (dto.getCpf() != null) {
-        user.setCpf(dto.getCpf());
-    }
-
-    repository.save(user);
-
-    // retorno UNIFICADO
-    return userMapper.toProfileResponse(user);
-}
-
-    // metodo para buscar o obj usuario
-    public UserProfileResponseDTO getPerfil(String emailUsuarioLogado) {
+            String emailUsuarioLogado,
+            UpdatePerfilRequestDTO dto) {
 
         User user = repository.findByEmail(emailUsuarioLogado)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        if (dto.getName() != null) {
+            user.setName(dto.getName());
+        }
+
+        if (dto.getEmail() != null) {
+            user.setEmail(dto.getEmail());
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        if (dto.getTelephone() != null) {
+            user.setTelephone(dto.getTelephone());
+        }
+
+        if (dto.getCpf() != null) {
+            user.setCpf(dto.getCpf());
+        }
+
+        repository.save(user);
+
+        // retorno UNIFICADO
+        return userMapper.toProfileResponse(user);
+    }
+
+    // metodo para buscar o obj usuario
+    public UserProfileResponseDTO getPerfil(String email) {
+        User user = repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         return userMapper.toUserProfileResponse(user);
     }
