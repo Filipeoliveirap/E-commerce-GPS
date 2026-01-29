@@ -1,3 +1,4 @@
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -5,6 +6,7 @@
   font-family: "Space Grotesk", sans-serif;
 }
 
+/* APP */
 .app {
   min-height: 100vh;
   background: #f8fafc;
@@ -116,6 +118,7 @@
   align-items: center;
 }
 
+/* BOTÕES */
 .btn-save {
   background: #f0d63a;
   border: none;
@@ -125,6 +128,21 @@
   border-radius: 8px;
 }
 
+.btn-edit {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #2563eb;
+  color: #fff;
+  font-size: 12px;
+}
+
+.btn-edit:hover {
+  background: #1e40af;
+}
+
+/* FORM — 2 LINHAS / 3 COLUNAS */
 .form {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -138,14 +156,23 @@
   gap: 6px;
 }
 
-.form-group.full {
-  grid-column: span 2;
-}
-
 .form-group input {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
+}
+
+/* INPUT + BOTÕES */
+.input-edit-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* INPUT DESABILITADO */
+input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
 }
 
 /* FOOTER */
@@ -154,4 +181,25 @@
   text-align: center;
   background: white;
   border-top: 1px solid #ddd;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .main {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
 }
