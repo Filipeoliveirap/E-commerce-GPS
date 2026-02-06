@@ -166,7 +166,31 @@
 .input-edit-wrapper {
   display: flex;
   gap: 8px;
-  align-items: center;
+  align-items: center; /* Alinha input e botões verticalmente */
+  flex-wrap: wrap;
+}
+
+
+.input-edit-wrapper input {
+  flex: 1;            
+  min-width: 200px;   
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.input-edit-wrapper button {
+  padding: 6px 12px;  
+  font-size: 12px;     
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-wrapper {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* INPUT DESABILITADO */

@@ -2,5 +2,9 @@ export const BASE_URL = "http://localhost:8080";
 
 export const UsersEndpoit = {
     LOGIN: "/auth/login",
-    REGISTER: "/auth/register"
+    REGISTER: "/auth/register",
+    GET_PROFILE: "/api/users/perfil",
+    UPDATE_PROFILE: "/api/users/perfil",
+    UPDATE_PASSWORD: "/api/users/senha",
+    CAMPOS_REAIS: "/api/users/reais",
 };

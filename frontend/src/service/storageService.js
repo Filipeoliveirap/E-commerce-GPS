@@ -15,6 +15,10 @@ export const storage = {
         return user ? JSON.parse(user) : null
     },
 
+    setUser(user) {
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+    },
+
     clearAuth() {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USER_KEY);

@@ -1,125 +1,132 @@
 import React, { useEffect, useState } from "react";
 import "../Perfil/Perfil.css";
-import { storage } from "../../service/storageService";
+import { useProfile } from "../../hook/useProfile";
+import { MaskUtils } from "../../utils/maskUtils";
 
 export default function PerfilUsuario() {
-  const [perfil, setPerfil] = useState({
-    name: "",
-    email: "",
-    cpf: "",
-    telephone: "",
-    role: ""
+  const {
+    user,
+    loading,
+    handleUpdateProfile,
+    handleUpdatePassword,
+    fetchCamposReais,
+    camposReais,
+  } = useProfile();
+
+  const [form, setForm] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    cpf: user?.cpf || "",
+    telephone: user?.telephone || "",
   });
 
-  const [novaSenha, setNovaSenha] = useState("");
-
+  const [newPassword, setNewPassword] = useState("");
   const [editando, setEditando] = useState({
     name: false,
-    telephone: false,
     email: false,
     cpf: false,
-    password: false
+    telephone: false,
+    password: false,
   });
 
-  const [mostrar, setMostrar] = useState({
-    password: false
-  });
+  const [mostrarSenha, setMostrarSenha] = useState(false);
 
-  const token = storage.getToken();
-
-  const toggleEdit = (campo) => {
-    setEditando((prev) => ({
-      ...prev,
-      [campo]: !prev[campo]
-    }));
-  };
-
-  const toggleMostrar = (campo) => {
-    setMostrar((prev) => ({
-      ...prev,
-      [campo]: !prev[campo]
-    }));
-  };
-
-  // 🔹 BUSCAR PERFIL
+  // Sincroniza o form quando o user é carregado
   useEffect(() => {
-    if (!token) return;
+    if (!user) return;
 
-    fetch("http://localhost:8080/api/users/perfil", {
-      headers: {
-        Authorization: `Bearer ${token}`
+    const updateForm = () => {
+      setForm({
+        name: user.name || "",
+        email: user.email || "",
+        cpf: user.cpf || "",
+        telephone: user.telephone || "",
+      });
+    };
+
+    setTimeout(updateForm, 0);
+  }, [user]);
+
+  // Alterna edição
+  const toggleEdit = (campo) => {
+    setEditando((prev) => ({ ...prev, [campo]: !prev[campo] }));
+
+    setForm((prev) => ({
+      ...prev,
+      [campo]: prev[campo] || camposReais[campo] || user[campo],
+    }));
+  };
+  // Alterna visibilidade da senha
+  const toggleMostrarSenha = () => setMostrarSenha((prev) => !prev);
+
+  // Salva perfil
+  const handleSave = async () => {
+    if (!user) return;
+
+    const formParaEnvio = { ...form };
+
+    ["email", "cpf", "telephone"].forEach((campo) => {
+      // Se o valor atual do form é igual à versão mascarada do campo real
+      if (
+        campo === "email" &&
+        form[campo] === MaskUtils.maskEmail(camposReais[campo])
+      ) {
+        formParaEnvio[campo] = camposReais[campo]; // envia o valor real
+      } else if (
+        campo === "cpf" &&
+        form[campo] === MaskUtils.maskCpf(camposReais[campo])
+      ) {
+        formParaEnvio[campo] = camposReais[campo];
+      } else if (
+        campo === "telephone" &&
+        form[campo] === MaskUtils.maskTelephone(camposReais[campo])
+      ) {
+        formParaEnvio[campo] = camposReais[campo];
       }
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Erro ao buscar perfil");
-        return res.json();
-      })
-      .then((data) => {
-        setPerfil({
-          name: data.name ?? "",
-          email: data.email ?? "",
-          cpf: data.cpf ?? "",
-          telephone: data.telephone ?? "",
-          role: data.role ?? ""
-        });
-      })
-      .catch(console.error);
-  }, [token]);
+    });
 
-  // 🔹 SALVAR PERFIL Ainda precisa de alguns ajustes
-  const handleSave = () => {
-    if (!token) return;
+    const sucesso = await handleUpdateProfile(formParaEnvio);
 
-    fetch("http://localhost:8080/api/users/perfil", {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: perfil.name,
-        telephone: perfil.telephone,
-        email: perfil.email,
-        cpf: perfil.cpf
-      })
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Erro ao atualizar perfil");
-        alert("Perfil atualizado com sucesso!");
-        setEditando({
-          name: false,
-          telephone: false,
-          email: false,
-          cpf: false,
-          password: false
-        });
-      })
-      .catch(console.error);
+    if (sucesso) {
+      setEditando({
+        name: false,
+        email: false,
+        cpf: false,
+        telephone: false,
+        password: false,
+      });
+      setForm(formParaEnvio);
+    }
   };
 
-  // 🔹 SALVAR SENHA
-  const handleSaveSenha = () => {
-    if (!novaSenha) {
-      alert("Digite uma nova senha");
-      return;
+  // Salva nova senha
+  const handleSaveSenha = async () => {
+    const sucesso = await handleUpdatePassword(newPassword);
+    if (sucesso) {
+      setNewPassword("");
+      setEditando((prev) => ({ ...prev, newPassword: false }));
+      setMostrarSenha(false);
     }
+  };
 
-    fetch("http://localhost:8080/api/users/password", {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ password: novaSenha })
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Erro ao alterar senha");
-        alert("Senha alterada com sucesso!");
-        setNovaSenha("");
-        setEditando((prev) => ({ ...prev, password: false }));
-        setMostrar((prev) => ({ ...prev, password: false }));
-      })
-      .catch(console.error);
+  const campos = [
+    { name: "name", label: "Nome", type: "text" },
+    { name: "cpf", label: "CPF", type: "text" },
+    { name: "telephone", label: "Telefone", type: "tel" },
+    { name: "email", label: "E-mail", type: "email" },
+  ];
+
+  const [mostrarCampo, setMostrarCampo] = useState({
+    email: false,
+    cpf: false,
+    telephone: false,
+  });
+
+  const toggleMostrarCampo = async (campo) => {
+    if (!camposReais.email && !camposReais.cpf && !camposReais.telephone) {
+      await fetchCamposReais();
+    }
+    setMostrarCampo((prev) => ({ ...prev, [campo]: !prev[campo] }));
   };
 
   return (
@@ -133,13 +140,11 @@ export default function PerfilUsuario() {
               A.J.F. <span>Eletrônicos</span>
             </h2>
           </div>
-
           <input className="search" placeholder="Buscar produtos..." />
-
           <div className="user-info">
             <img src="https://i.pravatar.cc/150" alt="Perfil" />
             <div>
-              <p className="user-name">{perfil.name}</p>
+              <p className="user-name">{user?.name}</p>
               <span>Minha Conta</span>
             </div>
           </div>
@@ -163,146 +168,110 @@ export default function PerfilUsuario() {
               <h1>Dados Pessoais</h1>
               <p>Visualize e edite suas informações</p>
             </div>
-
-            <button className="btn-save" onClick={handleSave}>
-              Salvar Alterações
+            <button
+              className="btn-save"
+              onClick={handleSave}
+              disabled={loading}
+            >
+              {loading ? "Atualizando..." : "Salvar Alterações"}
             </button>
           </div>
 
           <form className="form">
-            {/* NOME */}
-            <div className="form-group">
-              <label>Nome Completo</label>
-              <div className="input-edit-wrapper">
-                <input
-                  type="text"
-                  value={perfil.name}
-                  disabled={!editando.name}
-                  onChange={(e) =>
-                    setPerfil({ ...perfil, name: e.target.value })
-                  }
-                />
-                <button
-                  type="button"
-                  className="btn-edit"
-                  onClick={() => toggleEdit("name")}
-                >
-                  {editando.name ? "Salvar" : "Editar"}
-                </button>
-              </div>
-            </div>
+            {/* Campos do usuário */}
+            {campos.map((campo) => (
+              <div className="form-group" key={campo.name}>
+                <label>{campo.label}</label>
+                <div className="input-edit-wrapper">
+                  <input
+                    type={"text"}
+                    value={
+                      mostrarCampo[campo.name] && camposReais[campo.name]
+                        ? camposReais[campo.name]
+                        : form[campo.name]
+                    }
+                    disabled={!editando[campo.name]}
+                    onChange={(e) =>
+                      setForm({ ...form, [campo.name]: e.target.value })
+                    }
+                  />
+                  {campo.name !== "name" && (
+                    <button
+                      type="button"
+                      className="btn-edit"
+                      onClick={() => toggleMostrarCampo(campo.name)}
+                    >
+                      {mostrarCampo[campo.name] ? "Ocultar" : "Mostrar"}
+                    </button>
+                  )}
 
-            {/* PERFIL */}
+                  <button
+                    type="button"
+                    className="btn-edit"
+                    onClick={() => toggleEdit(campo.name)}
+                  >
+                    {editando[campo.name] ? "Cancelar" : "Editar"}
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Perfil */}
             <div className="form-group">
               <label>Perfil</label>
-              <input type="text" value={perfil.role} readOnly />
+              <input type="text" value={user?.role || ""} readOnly />
             </div>
 
-            {/* CPF */}
-            <div className="form-group">
-              <label>CPF</label>
-              <div className="input-edit-wrapper">
-                <input
-                  type="text"
-                  value={perfil.cpf}
-                  disabled={!editando.cpf}
-                  onChange={(e) =>
-                    setPerfil({ ...perfil, cpf: e.target.value })
-                  }
-                />
-                <button
-                  type="button"
-                  className="btn-edit"
-                  onClick={() => toggleEdit("cpf")}
-                >
-                  {editando.cpf ? "Salvar" : "Editar"}
-                </button>
-              </div>
-            </div>
-
-            {/* TELEFONE */}
-            <div className="form-group">
-              <label>Telefone</label>
-              <div className="input-edit-wrapper">
-                <input
-                  type="tel"
-                  value={perfil.telephone}
-                  disabled={!editando.telephone}
-                  onChange={(e) =>
-                    setPerfil({ ...perfil, telephone: e.target.value })
-                  }
-                />
-                <button
-                  type="button"
-                  className="btn-edit"
-                  onClick={() => toggleEdit("telephone")}
-                >
-                  {editando.telephone ? "Salvar" : "Editar"}
-                </button>
-              </div>
-            </div>
-
-            {/* EMAIL */}
-            <div className="form-group">
-              <label>E-mail</label>
-              <div className="input-edit-wrapper">
-                <input
-                  type="email"
-                  value={perfil.email}
-                  disabled={!editando.email}
-                  onChange={(e) =>
-                    setPerfil({ ...perfil, email: e.target.value })
-                  }
-                />
-                <button
-                  type="button"
-                  className="btn-edit"
-                  onClick={() => toggleEdit("email")}
-                >
-                  {editando.email ? "Salvar" : "Editar"}
-                </button>
-              </div>
-            </div>
-
-            {/* SENHA */}
+            {/* Senha */}
             <div className="form-group">
               <label>Senha</label>
               <div className="input-edit-wrapper">
                 <input
-                  type={mostrar.password ? "text" : "password"}
-                  value={editando.password ? novaSenha : "Senha atual"}
+                  type={mostrarSenha ? "text" : "password"}
+                  value={newPassword}
                   disabled={!editando.password}
-                  placeholder="Digite uma nova senha"
-                  onChange={(e) => setNovaSenha(e.target.value)}
+                  placeholder={
+                    editando.password ? "Digite uma nova senha" : "********"
+                  }
+                  onChange={(e) => setNewPassword(e.target.value)}
                 />
-
-                <button
-                  type="button"
-                  className="btn-edit"
-                  onClick={() => toggleMostrar("password")}
-                >
-                  {mostrar.password ? "Ocultar" : "Mostrar"}
-                </button>
-
-                <button
-                  type="button"
-                  className="btn-edit"
-                  onClick={() => toggleEdit("password")}
-                >
-                  {editando.password ? "Cancelar" : "Editar"}
-                </button>
+                <div className="btn-wrapper">
+                  {editando.password && (
+                    <>
+                      <button
+                        type="button"
+                        className="btn-edit"
+                        onClick={toggleMostrarSenha}
+                      >
+                        {mostrarSenha ? "Ocultar" : "Mostrar"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-edit"
+                        onClick={() => toggleEdit("password")}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-save"
+                        onClick={handleSaveSenha}
+                      >
+                        Salvar
+                      </button>
+                    </>
+                  )}
+                  {!editando.password && (
+                    <button
+                      type="button"
+                      className="btn-edit"
+                      onClick={() => toggleEdit("password")}
+                    >
+                      Editar
+                    </button>
+                  )}
+                </div>
               </div>
-
-              {editando.password && (
-                <button
-                  type="button"
-                  className="btn-save"
-                  style={{ marginTop: "10px" }}
-                  onClick={handleSaveSenha}
-                >
-                  Salvar Nova Senha
-                </button>
-              )}
             </div>
           </form>
         </section>
