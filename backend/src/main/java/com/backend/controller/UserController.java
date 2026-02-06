@@ -1,5 +1,7 @@
 package com.backend.controller;
 
+import com.backend.business.DTO.UserDTOs.CamposReaisResponseDTO;
+import com.backend.business.DTO.UserDTOs.UpdatePasswordRequestDTO;
 import com.backend.business.DTO.UserDTOs.UpdatePerfilRequestDTO;
 import com.backend.business.DTO.UserDTOs.UserProfileResponseDTO;
 import com.backend.business.service.UserService;
@@ -34,4 +36,23 @@ public class UserController {
         return ResponseEntity.ok(
                 userService.getPerfil(emailUsuarioLogado));
     }
+
+    @PutMapping("/senha")
+    public ResponseEntity<Void> updatePassword(
+            Authentication authentication,
+            @Valid @RequestBody UpdatePasswordRequestDTO dto) {
+        String emailUsuarioLogado = authentication.getName();
+        userService.updatePassword(emailUsuarioLogado, dto.getNewPassword());
+        return ResponseEntity.noContent().build(); // 204, sem retorno
+    }
+
+    @GetMapping("/reais")
+    public ResponseEntity<CamposReaisResponseDTO> getCamposReais(
+            Authentication authentication) {
+        String emailUsuarioLogado = authentication.getName();
+        CamposReaisResponseDTO dto = userService.getCamposReais(emailUsuarioLogado);
+        return ResponseEntity.ok(dto);
+    }
+
+
 }

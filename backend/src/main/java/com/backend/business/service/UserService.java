@@ -73,31 +73,33 @@ public class UserService {
         User user = repository.findByEmail(emailUsuarioLogado)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        if (dto.getName() != null) {
-            user.setName(dto.getName());
-        }
-
-        if (dto.getEmail() != null) {
+        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
+            if (repository.findByEmail(dto.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("Email já cadastrado");
+            }
             user.setEmail(dto.getEmail());
         }
 
-        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        if (dto.getCpf() != null && !dto.getCpf().equals(user.getCpf())) {
+            if (repository.findBycpf(dto.getCpf()).isPresent()) {
+                throw new IllegalArgumentException("CPF já cadastrado");
+            }
+            user.setCpf(dto.getCpf());
+        }
+
+        if (dto.getName() != null) {
+            user.setName(dto.getName());
         }
 
         if (dto.getTelephone() != null) {
             user.setTelephone(dto.getTelephone());
         }
 
-        if (dto.getCpf() != null) {
-            user.setCpf(dto.getCpf());
-        }
-
         repository.save(user);
 
-        // retorno UNIFICADO
         return userMapper.toProfileResponse(user);
     }
+
 
     // metodo para buscar o obj usuario
     public UserProfileResponseDTO getPerfil(String email) {
@@ -106,5 +108,21 @@ public class UserService {
 
         return userMapper.toUserProfileResponse(user);
     }
+
+    public void updatePassword(String emailUsuarioLogado, String novaSenha) {
+        User user = repository.findByEmail(emailUsuarioLogado)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        user.setPassword(passwordEncoder.encode(novaSenha));
+        repository.save(user);
+    }
+
+    public CamposReaisResponseDTO getCamposReais(String emailUsuarioLogado) {
+        User user = repository.findByEmail(emailUsuarioLogado)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        return userMapper.toCamposReaisDTO(user);
+    }
+
 
 }
