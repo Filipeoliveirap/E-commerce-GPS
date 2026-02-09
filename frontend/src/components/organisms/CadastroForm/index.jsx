@@ -6,7 +6,9 @@ import {
   validateCPF,
   validatePhone as validatePhoneUtil,
   validatePassword,
+  validateName,
 } from "../../../utils/validators";
+
 import { Link } from "react-router-dom";
 import Input from "../../atoms/Input";
 import Button from "../../atoms/Button";
@@ -54,46 +56,64 @@ export default function CadastroForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setLoading(true);
+
+    const cleanData = {
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      cpf: formData.cpf,
+      password: formData.password,
+      telefone: formData.telefone,
+      terms: formData.terms,
+    };
+
     const newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = "Nome obrigatório";
-    if (!formData.email.trim()) newErrors.email = "E-mail obrigatório";
-    else if (!validateEmail(formData.email))
+    if (!validateName(formData.name)) {
+      newErrors.name = "Nome inválido";
+    }
+
+    if (!cleanData.email) newErrors.email = "E-mail obrigatório";
+    else if (!validateEmail(cleanData.email))
       newErrors.email = "E-mail inválido";
 
-    if (!formData.cpf.trim()) newErrors.cpf = "CPF obrigatório";
-    else if (!validateCPF(formData.cpf)) newErrors.cpf = "CPF inválido";
+    if (!validateCPF(cleanData.cpf)) newErrors.cpf = "CPF inválido";
 
-    if (!formData.password) newErrors.password = "Senha obrigatória";
-    else if (!validatePassword(formData.password))
-      newErrors.password = "Mínimo 6 caracteres";
+    if (!validatePassword(cleanData.password))
+      newErrors.password = "A senha deve ter no mínimo 6 caracteres";
 
-    if (!formData.telefone.trim()) newErrors.telefone = "Telefone obrigatório";
-    else if (!validatePhoneUtil(formData.telefone))
+    if (!validatePhoneUtil(cleanData.telefone))
       newErrors.telefone = "Telefone inválido";
 
-    if (!formData.terms) newErrors.terms = "Aceite os termos";
+    if (!cleanData.terms) newErrors.terms = "Aceite os termos";
 
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      const result = await handleRegister(formData);
-      if (result.success) {
-        setSuccessMessage("Cadastro realizado com sucesso!");
-        setErrors({});
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          cpf: "",
-          telefone: "",
-          terms: false,
-        });
-        navigate("/login");
-      } else {
-        setErrors((prev) => ({ ...prev, submit: result.message }));
-      }
+    if (Object.keys(newErrors).length > 0) {
+      setLoading(false);
+      return;
     }
+
+    const result = await handleRegister(cleanData);
+
+    if (result.success) {
+      setSuccessMessage("Cadastro realizado com sucesso!");
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        cpf: "",
+        telefone: "",
+        terms: false,
+      });
+      setErrors({});
+      navigate("/login");
+    } else {
+      setErrors({ submit: result.message || "Erro ao cadastrar" });
+    }
+
+    setLoading(false);
   };
 
   return (

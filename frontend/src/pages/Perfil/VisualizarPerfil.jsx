@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../Perfil/Perfil.css";
 import { useProfile } from "../../hook/useProfile";
 import { MaskUtils } from "../../utils/maskUtils";
+import { validators } from "../../utils/validators";
 
 export default function PerfilUsuario() {
   const {
@@ -63,15 +64,36 @@ export default function PerfilUsuario() {
   const handleSave = async () => {
     if (!user) return;
 
+    // 🔴 Validações
+    if (!validators.email(form.email)) {
+      alert("E-mail inválido");
+      return;
+    }
+
+    if (!validators.name(form.name)) {
+      alert("Nome inválido");
+      return;
+    }
+
+    if (!validators.cpf(form.cpf)) {
+      alert("CPF inválido");
+      return;
+    }
+
+    if (!validators.phone(form.telephone)) {
+      alert("Telefone inválido");
+      return;
+    }
+
     const formParaEnvio = { ...form };
 
+    // lógica de campos mascarados (mantém como está)
     ["email", "cpf", "telephone"].forEach((campo) => {
-      // Se o valor atual do form é igual à versão mascarada do campo real
       if (
         campo === "email" &&
         form[campo] === MaskUtils.maskEmail(camposReais[campo])
       ) {
-        formParaEnvio[campo] = camposReais[campo]; // envia o valor real
+        formParaEnvio[campo] = camposReais[campo];
       } else if (
         campo === "cpf" &&
         form[campo] === MaskUtils.maskCpf(camposReais[campo])
@@ -101,10 +123,16 @@ export default function PerfilUsuario() {
 
   // Salva nova senha
   const handleSaveSenha = async () => {
+    if (!validators.password(newPassword)) {
+      alert("A senha deve ter no mínimo 6 caracteres");
+      return;
+    }
+
     const sucesso = await handleUpdatePassword(newPassword);
+
     if (sucesso) {
       setNewPassword("");
-      setEditando((prev) => ({ ...prev, newPassword: false }));
+      setEditando((prev) => ({ ...prev, password: false }));
       setMostrarSenha(false);
     }
   };
