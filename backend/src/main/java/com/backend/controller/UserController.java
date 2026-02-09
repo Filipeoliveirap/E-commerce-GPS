@@ -1,6 +1,7 @@
 package com.backend.controller;
 
 import com.backend.business.DTO.UserDTOs.CamposReaisResponseDTO;
+import com.backend.business.DTO.UserDTOs.DeleteAccountRequestDTO;
 import com.backend.business.DTO.UserDTOs.UpdatePasswordRequestDTO;
 import com.backend.business.DTO.UserDTOs.UpdatePerfilRequestDTO;
 import com.backend.business.DTO.UserDTOs.UserProfileResponseDTO;
@@ -53,6 +54,17 @@ public class UserController {
         CamposReaisResponseDTO dto = userService.getCamposReais(emailUsuarioLogado);
         return ResponseEntity.ok(dto);
     }
+
+    @DeleteMapping("/conta")
+    public ResponseEntity<Void> deleteAccount(
+            Authentication authentication,
+            @Valid @RequestBody DeleteAccountRequestDTO dto) {
+        String emailUsuarioLogado = authentication.getName();
+        userService.deleteAccount(emailUsuarioLogado, dto);
+        return ResponseEntity.noContent().build(); // 204, sem retorno
+    }
+
+
 
 
 }

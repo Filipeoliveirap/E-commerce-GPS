@@ -1,18 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "../store/authStore";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   updateProfile,
   getProfile,
   updatePassword,
   getCamposReais,
-  deleteAccount,
 } from "../service/usersService";
 
 export function useProfile() {
-  const { user, token, updateUser, logout } = useAuthStore();
-  const navigate = useNavigate();
+  const { user, token, updateUser } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
   const [camposReais, setCamposReais] = useState({
@@ -86,25 +83,8 @@ export function useProfile() {
       setLoading(false);
     }
   }, [token]);
-  const handleDeleteAccount = useCallback(async () => {
-    try {
-      setLoading(true);
-      await deleteAccount(token);
-      logout();
-      toast.success("Conta deletada com sucesso!");
-      navigate("/");
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [token, logout, navigate]);
 
-  const handleLogout = useCallback(() => {
-    logout();
-    navigate("/");
-  }, [logout, navigate]);
-
+  
   useEffect(() => {
     handleGetProfile();
   }, [handleGetProfile]);
@@ -116,8 +96,6 @@ export function useProfile() {
     handleUpdatePassword,
     handleGetProfile,
     fetchCamposReais,
-    camposReais,
-    handleDeleteAccount,
-    handleLogout,
+    camposReais, 
   };
 }
