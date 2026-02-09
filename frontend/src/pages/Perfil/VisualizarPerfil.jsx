@@ -64,49 +64,85 @@ export default function PerfilUsuario() {
   const handleSave = async () => {
     if (!user) return;
 
-    // 🔴 Validações
-    if (!validators.email(form.email)) {
-      alert("E-mail inválido");
+    // 1️⃣ Descobre quais campos estão em edição
+    const camposEditados = Object.keys(editando).filter(
+      (campo) => editando[campo] && campo !== "password",
+    );
+
+    if (camposEditados.length === 0) {
+      alert("Nenhuma alteração para salvar");
       return;
     }
 
-    if (!validators.name(form.name)) {
-      alert("Nome inválido");
-      return;
+    const formParaEnvio = {};
+
+    // 2️⃣ Valida SOMENTE os campos editados
+    for (const campo of camposEditados) {
+      const valor = form[campo];
+
+      switch (campo) {
+        case "email":
+          if (!validators.email(valor)) {
+            alert("E-mail inválido");
+            return;
+          }
+          break;
+
+        case "name":
+          if (!validators.name(valor)) {
+            alert("Nome inválido");
+            return;
+          }
+          break;
+
+        case "cpf":
+          if (!validators.cpf(valor)) {
+            alert("CPF inválido");
+            return;
+          }
+          break;
+
+        case "telephone":
+          if (!validators.phone(valor)) {
+            alert("Telefone inválido");
+            return;
+          }
+          break;
+
+        default:
+          break;
+      }
+
+      formParaEnvio[campo] = valor;
     }
 
-    if (!validators.cpf(form.cpf)) {
-      alert("CPF inválido");
-      return;
-    }
-
-    if (!validators.phone(form.telephone)) {
-      alert("Telefone inválido");
-      return;
-    }
-
-    const formParaEnvio = { ...form };
-
-    // lógica de campos mascarados (mantém como está)
+    // 3️⃣ Corrige campos mascarados (se não mudou, envia o real)
     ["email", "cpf", "telephone"].forEach((campo) => {
+      if (!formParaEnvio[campo]) return;
+
       if (
         campo === "email" &&
-        form[campo] === MaskUtils.maskEmail(camposReais[campo])
+        formParaEnvio[campo] === MaskUtils.maskEmail(camposReais[campo])
       ) {
         formParaEnvio[campo] = camposReais[campo];
-      } else if (
+      }
+
+      if (
         campo === "cpf" &&
-        form[campo] === MaskUtils.maskCpf(camposReais[campo])
+        formParaEnvio[campo] === MaskUtils.maskCpf(camposReais[campo])
       ) {
         formParaEnvio[campo] = camposReais[campo];
-      } else if (
+      }
+
+      if (
         campo === "telephone" &&
-        form[campo] === MaskUtils.maskTelephone(camposReais[campo])
+        formParaEnvio[campo] === MaskUtils.maskTelephone(camposReais[campo])
       ) {
         formParaEnvio[campo] = camposReais[campo];
       }
     });
 
+    // 4️⃣ Envia somente o que mudou
     const sucesso = await handleUpdateProfile(formParaEnvio);
 
     if (sucesso) {
@@ -117,7 +153,8 @@ export default function PerfilUsuario() {
         telephone: false,
         password: false,
       });
-      setForm(formParaEnvio);
+
+      setForm((prev) => ({ ...prev, ...formParaEnvio }));
     }
   };
 
