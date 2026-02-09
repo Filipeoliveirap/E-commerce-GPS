@@ -224,7 +224,6 @@ export default function PerfilUsuario() {
           <p>Configurações da conta</p>
           <ul>
             <li className="active">Dados Pessoais</li>
-            <li className="logout">Sair da Conta</li>
             <li>
               <div style={{ marginTop: "20px" }}>
                 <p
