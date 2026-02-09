@@ -7,4 +7,5 @@ export const UsersEndpoit = {
     UPDATE_PROFILE: "/api/users/perfil",
     UPDATE_PASSWORD: "/api/users/senha",
     CAMPOS_REAIS: "/api/users/reais",
+    DELETE_ACCOUNT: "/api/users/conta",
 };
