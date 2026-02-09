@@ -204,14 +204,15 @@ export default function PerfilUsuario() {
                       {mostrarCampo[campo.name] ? "Ocultar" : "Mostrar"}
                     </button>
                   )}
-
-                  <button
-                    type="button"
-                    className="btn-edit"
-                    onClick={() => toggleEdit(campo.name)}
-                  >
-                    {editando[campo.name] ? "Cancelar" : "Editar"}
-                  </button>
+                  {campo.name !== "email" && (
+                    <button
+                      type="button"
+                      className="btn-edit"
+                      onClick={() => toggleEdit(campo.name)}
+                    >
+                      {editando[campo.name] ? "Cancelar" : "Editar"}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
