@@ -29,7 +29,7 @@ public class UserService {
     // Metodo de lógica para registro de usuário
     public RegisterResponseDTO register(RegisterRequestDTO dto) {
 
-        if (repository.findByEmail(dto.getEmail()).isPresent()) {
+        if (repository.findByEmail(dto.getEmail().toLowerCase()).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado");
         }
 
@@ -39,6 +39,7 @@ public class UserService {
 
         User user = userMapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole(com.backend.infrastructure.model.UserRole.USER);
 
         repository.save(user);
 
@@ -73,11 +74,11 @@ public class UserService {
         User user = repository.findByEmail(emailUsuarioLogado)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
-            if (repository.findByEmail(dto.getEmail()).isPresent()) {
+        if (dto.getEmail() != null && !dto.getEmail().toLowerCase().equals(user.getEmail())) {
+            if (repository.findByEmail(dto.getEmail().toLowerCase()).isPresent()) {
                 throw new IllegalArgumentException("Email já cadastrado");
             }
-            user.setEmail(dto.getEmail());
+            user.setEmail(dto.getEmail().toLowerCase());
         }
 
         if (dto.getCpf() != null && !dto.getCpf().equals(user.getCpf())) {
@@ -124,5 +125,15 @@ public class UserService {
         return userMapper.toCamposReaisDTO(user);
     }
 
+    public void deleteAccount(String emailUsuarioLogado, DeleteAccountRequestDTO dto) {
+        if (dto.getConfirmed() == null || !dto.getConfirmed()) {
+            throw new IllegalArgumentException("Confirmação de deleção é obrigatória");
+        }
+
+        User user = repository.findByEmail(emailUsuarioLogado)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        repository.delete(user);
+    }
 
 }

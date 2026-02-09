@@ -58,3 +58,20 @@ export const getCamposReais = async (token) => {
     throw error;
   }
 };
+
+export async function deleteAccount(token) {
+  try {
+    const response = await api({
+      method: 'delete',
+      url: UsersEndpoit.DELETE_ACCOUNT,
+      headers: { Authorization: `Bearer ${token}` },
+      data: { confirmed: true },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Erro ao deletar conta.",
+    );
+  }
+}
+
