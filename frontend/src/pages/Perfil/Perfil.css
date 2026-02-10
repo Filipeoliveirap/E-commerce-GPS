@@ -143,6 +143,11 @@
   align-items: center;
 }
 
+.error-message {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
 /* BOTÕES */
 .btn-save {
   background: #f0d63a;
@@ -195,18 +200,17 @@
   flex-wrap: wrap;
 }
 
-
 .input-edit-wrapper input {
-  flex: 1;            
-  min-width: 200px;   
+  flex: 1;
+  min-width: 200px;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
 }
 
 .input-edit-wrapper button {
-  padding: 6px 12px;  
-  font-size: 12px;     
+  padding: 6px 12px;
+  font-size: 12px;
   border-radius: 6px;
   border: none;
   cursor: pointer;

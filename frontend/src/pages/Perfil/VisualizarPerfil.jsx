@@ -23,6 +23,14 @@ export default function PerfilUsuario() {
     telephone: user?.telephone || "",
   });
 
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    cpf: "",
+    telephone: "",
+    password: "",
+  });
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [newPassword, setNewPassword] = useState("");
@@ -261,7 +269,7 @@ export default function PerfilUsuario() {
             <button
               className="btn-save"
               onClick={handleSave}
-              disabled={loading}
+              disabled={loading || Object.values(errors).some((e) => e !== "")}
             >
               {loading ? "Atualizando..." : "Salvar Alterações"}
             </button>
@@ -281,10 +289,43 @@ export default function PerfilUsuario() {
                         : form[campo.name]
                     }
                     disabled={!editando[campo.name]}
-                    onChange={(e) =>
-                      setForm({ ...form, [campo.name]: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const valor = e.target.value.trimStart();
+
+                      // Atualiza o form
+                      setForm((prev) => ({ ...prev, [campo.name]: valor }));
+
+                      // Valida imediatamente
+                      let erro = "";
+                      switch (campo.name) {
+                        case "name":
+                          if (!validators.name(valor)) erro = "Nome inválido";
+                          break;
+                        case "email":
+                          if (!validators.email(valor)) erro = "Email inválido";
+                          break;
+                        case "cpf":
+                          if (!validators.cpf(valor)) erro = "CPF inválido";
+                          break;
+                        case "telephone":
+                          if (!validators.phone(valor))
+                            erro = "Telefone inválido";
+                          break;
+                        case "password":
+                          if (!validators.password(valor))
+                            erro = "Senha deve ter no mínimo 6 caracteres";
+                          break;
+                        default:
+                          break;
+                      }
+                      setErrors((prev) => ({ ...prev, [campo.name]: erro }));
+                    }}
                   />
+
+                  {errors[campo.name] && (
+                    <span className="error-message">{errors[campo.name]}</span>
+                  )}
+
                   {campo.name !== "name" && (
                     <button
                       type="button"

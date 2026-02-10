@@ -55,7 +55,7 @@ export const validateName = (name) => {
   const clean = name.trim();
 
   // Começa com letra, permite letras, espaços e acentos
-  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?: [A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
 
   return nameRegex.test(clean);
 };

@@ -36,21 +36,55 @@ export default function CadastroForm() {
   const handleInputChange = (e) => {
     let { name, value, type, checked } = e.target;
 
+    // Remove espaço no início automaticamente
+    if (type === "text" || type === "email" || type === "password") {
+      value = value.trimStart();
+    }
+
+    // Formata CPF e telefone
     if (name === "cpf") {
       value = formatCPF(value);
     } else if (name === "telefone") {
       value = formatPhone(value);
     }
 
+    // Atualiza formData
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+    // Validação em tempo real
+    let erro = "";
+    switch (name) {
+      case "name":
+        if (!validateName(value)) erro = "Nome inválido";
+        break;
+      case "email":
+        if (!value) erro = "E-mail obrigatório";
+        else if (!validateEmail(value)) erro = "E-mail inválido";
+        break;
+      case "cpf":
+        if (!validateCPF(value)) erro = "CPF inválido";
+        break;
+      case "telefone":
+        if (!validatePhoneUtil(value)) erro = "Telefone inválido";
+        break;
+      case "password":
+        if (!validatePassword(value))
+          erro = "Senha deve ter no mínimo 6 caracteres";
+        break;
+      case "terms":
+        if (!checked) erro = "Aceite os termos";
+        break;
+      default:
+        break;
     }
 
+    // Atualiza o estado de erros
+    setErrors((prev) => ({ ...prev, [name]: erro }));
+
+    // Limpa mensagens de sucesso
     setSuccessMessage("");
   };
 
@@ -242,7 +276,11 @@ export default function CadastroForm() {
       <div className="mt-6">
         <Button
           type="submit"
-          disabled={loading}
+          disabled={
+            loading ||
+            Object.values(errors).some((e) => e !== "") ||
+            !formData.terms
+          }
           variant="primary"
           size="md"
           className="group relative flex w-full justify-center"
