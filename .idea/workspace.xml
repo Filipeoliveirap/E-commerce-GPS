@@ -2,34 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aca3f47b-e767-44bf-aeb5-60b112645fd9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/DTO/UserDTOs/AddressDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/DTO/UserDTOs/AuthenticationDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/DTO/UserDTOs/LoginResponseDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/DTO/UserDTOs/RegisterRequestDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/DTO/UserDTOs/RegisterResponseDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/mappers/UserMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/service/AuthorizationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/controller/AuthorizationController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/model/Address.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/model/UserRole.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/security/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/security/SecurityFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/security/TokenService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/backend/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/model/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/infrastructure/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/DTO/UserDTOs/UpdatePerfilRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/backend/business/DTO/UserDTOs/UpdatePerfilRequestDTO.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/filip/Documents/E-commerce-GPSs" value="36f9Z9cq5WUpzcLCVFRPp5MoRa7" />
+    </persistenceIdMap>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="36f9Z9cq5WUpzcLCVFRPp5MoRa7" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -40,7 +30,9 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "ignore.virus.scanning.warn.message": "true"
+    "git-widget-placeholder": "integracao-backend-frontend",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true"
   }
 }]]></component>
   <component name="TaskManager">
@@ -52,5 +44,13 @@
       <updated>1765386813992</updated>
     </task>
     <servers />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>

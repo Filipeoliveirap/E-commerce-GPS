@@ -1,22 +1,26 @@
-package com.backend.business.service;
+package com.backend.infrastructure.security;
 
 import com.backend.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@Primary
 @RequiredArgsConstructor
-public class AuthorizationService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository repository;
 
-
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-    }
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
 
+        return repository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Usuário não encontrado"));
+    }
 }

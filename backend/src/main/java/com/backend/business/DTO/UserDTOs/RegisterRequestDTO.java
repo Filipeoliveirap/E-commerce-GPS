@@ -12,7 +12,10 @@ import lombok.NoArgsConstructor;
 public class RegisterRequestDTO {
     @NotBlank(message = "Nome não pode ser vazio")
     @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
-    @Pattern(regexp = "^[A-Za-zÀ-ú ]+$", message = "Nome deve conter apenas letras")
+    @Pattern(
+            regexp = "^[A-Za-zÀ-ú]+(?: [A-Za-zÀ-ú]+)*$",
+            message = "Nome deve conter apenas letras e espaços simples entre palavras, sem espaços no início ou no final"
+    )
     private String name;
 
     @NotBlank(message = "Email não pode ser vazio")

@@ -155,12 +155,9 @@ export default function Header({ hideOnScroll = true }) {
                 </div>
                 <ul className="divide-y divide-gray-200 dark:divide-navy-700">
                   <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2.5 text-sm text-navy-900 dark:text-white hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
-                    >
+                    <Link to="/perfil" className="block px-4 py-2.5 text-sm text-navy-900 dark:text-white hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors">
                       Perfil
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a
