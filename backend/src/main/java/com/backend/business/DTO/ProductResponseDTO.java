@@ -1,25 +1,29 @@
-package com.backend.infrastructure.model;
+package com.backend.business.DTO;
 
-import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
-@Document(collection = "products")
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Product {
+public class ProductResponseDTO {
 
-    @Id
     private String id;
 
     private String name;
+
     private String description;
+
     private Double price;
+
     private Double originalPrice;
+
     private String image;
+
     private String category;
+
     private Boolean inStock;
 }

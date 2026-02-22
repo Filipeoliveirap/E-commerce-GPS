@@ -1,13 +1,16 @@
 package com.backend.business.service;
 
-import com.backend.business.DTO.ProductDTO;
+import com.backend.business.DTO.*;
+import com.backend.business.mappers.PageMapper;
 import com.backend.business.mappers.ProductMapper;
 import com.backend.infrastructure.model.Product;
 import com.backend.infrastructure.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.domain.PageRequest;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +23,12 @@ public class ProductService {
     private final ProductRepository repository;
 
 
+
     public ProductDTO findById(String id) {
     Product product = repository.findById(id)
             .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
     return ProductMapper.toDTO(product);
-}
+    }
 
     
     public List<ProductDTO> findAll() {
@@ -34,15 +38,16 @@ public class ProductService {
                 .toList();
     }
 
-    
-    public ProductDTO create(ProductDTO dto) {
+
+    public ProductResponseDTO create(ProductCreateDTO dto) {
         Product product = ProductMapper.toEntity(dto);
-        product.setId(null); 
-        return ProductMapper.toDTO(repository.save(product));
+        product.setId(null);
+        Product saved = repository.save(product);
+        return ProductMapper.toResponseDTO(saved);
     }
 
-    
-    public ProductDTO update(String id, ProductDTO dto) {
+
+    public ProductResponseDTO update(String id, ProductUpdateDTO dto) {
         Product product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
@@ -51,42 +56,36 @@ public class ProductService {
         product.setPrice(dto.getPrice());
         product.setOriginalPrice(dto.getOriginalPrice());
         product.setImage(dto.getImage());
-        product.setRating(dto.getRating());
-        product.setReviews(dto.getReviews());
-        product.setDiscount(dto.getDiscount());
         product.setCategory(dto.getCategory());
         product.setInStock(dto.getInStock());
 
-        return ProductMapper.toDTO(repository.save(product));
+        Product updated = repository.save(product);
+
+        return ProductMapper.toResponseDTO(updated);
     }
 
     public void delete(String id) {
     Product product = repository.findById(id)
             .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
     repository.delete(product);
-}
+    }
 
-public List<ProductDTO> findByCategory(String category) {
-    return repository.findByCategory(category)
+    public List<ProductDTO> findByCategory(String category) {
+        return repository.findByCategory(category)
             .stream()
             .map(ProductMapper::toDTO)
             .toList();
-}
+    }
 
-public List<ProductDTO> findAllPaged(int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
-    return repository.findAll(pageable)
-            .stream()
-            .map(ProductMapper::toDTO)
-            .toList();
-}
+    public PageResponseDTO<ProductResponseDTO> findAllPaged(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-    public List<ProductDTO> seedProducts(List<ProductDTO> products) {
-    return products.stream()
-            .map((ProductDTO dto) -> {
-                Product saved = repository.save(ProductMapper.toEntity(dto));
-                return ProductMapper.toDTO(saved);
-            })
-            .collect(Collectors.toList());
-}
+        Page<Product> productPage = repository.findAll(pageable);
+
+        Page<ProductResponseDTO> dtoPage =
+                productPage.map(ProductMapper::toResponseDTO);
+
+        return PageMapper.toDTO(dtoPage);
+    }
+
 }

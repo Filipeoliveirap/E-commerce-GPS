@@ -1,8 +1,9 @@
 package com.backend.controller;
 
-import com.backend.business.DTO.ProductDTO;
+import com.backend.business.DTO.*;
 import com.backend.business.service.ProductService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,43 +24,39 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-public ProductDTO findById(@PathVariable String id) {
+    public ProductDTO findById(@PathVariable String id) {
     return service.findById(id);
 }
 
-    
+
     @PostMapping
-    public ProductDTO create(@RequestBody ProductDTO dto) {
+    public ProductResponseDTO create(@Valid @RequestBody ProductCreateDTO dto) {
         return service.create(dto);
     }
 
-    @PostMapping("/seed")
-public List<ProductDTO> seedProducts(@RequestBody List<ProductDTO> products) {
-    return service.seedProducts(products);
-}
 
-    
     @PutMapping("/{id}")
-    public ProductDTO update(@PathVariable String id,
-                             @RequestBody ProductDTO dto) {
+    public ProductResponseDTO update(
+            @PathVariable String id,
+            @Valid @RequestBody ProductUpdateDTO dto) {
         return service.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
-public void delete(@PathVariable String id) {
+    public void delete(@PathVariable String id) {
     service.delete(id);
 }
 
-@GetMapping("/category/{category}")
-public List<ProductDTO> findByCategory(@PathVariable String category) {
+    @GetMapping("/category/{category}")
+    public List<ProductDTO> findByCategory(@PathVariable String category) {
     return service.findByCategory(category);
 }
 
-@GetMapping("/paged")
-public List<ProductDTO> findAllPaged(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
-) {
-    return service.findAllPaged(page, size);
-}
+    @GetMapping("/paged")
+    public PageResponseDTO<ProductResponseDTO> findAllPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return service.findAllPaged(page, size);
+    }
 }
