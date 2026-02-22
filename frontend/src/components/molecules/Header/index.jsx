@@ -12,9 +12,10 @@ export default function Header({ hideOnScroll = true }) {
   const [cartCount, setCartCount] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAuthenticated, handleLogout } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
-  const { handleLogout } = useAuth();
+
+  const authenticatedUser = isAuthenticated ? user : null;
 
   useEffect(() => {
     if (!hideOnScroll) return;
@@ -84,12 +85,13 @@ export default function Header({ hideOnScroll = true }) {
             placeholder="Buscar produtos..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-full bg-gray-100 dark:bg-navy-900 border-none focus:ring-2 focus:ring-primary text-sm text-navy-900 dark:text-white placeholder-gray-400 outline-none transition-shadow"
+            autoComplete="off"
+            className="ajf-form-input has-leading-icon w-full pl-14 pr-4 py-2.5 rounded-full bg-gray-100 dark:bg-gray-100 border border-gray-200 dark:border-gray-300 focus:ring-2 focus:ring-primary text-sm text-navy-900 dark:text-navy-900 placeholder-gray-400 outline-none transition-shadow"
           />
           <Icon
             name="search"
             size="md"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="ajf-input-icon absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"
           />
         </div>
 
@@ -197,7 +199,7 @@ export default function Header({ hideOnScroll = true }) {
                   </li>
                 </ul>
                 {/* Sair da Conta/logout */}
-                {user && (
+                {authenticatedUser && (
                   <div className="border-t border-gray-200 dark:border-navy-700">
                     <button
                       onClick={() => { handleLogout();}}
@@ -213,7 +215,7 @@ export default function Header({ hideOnScroll = true }) {
           </div>
 
           {/* USUÁRIO NÃO LOGADO */}
-          {!user && (
+          {!authenticatedUser && (
             <>
               {location.pathname !== "/login" && (
                 <Link to="/login" className="hidden md:block">
@@ -234,9 +236,9 @@ export default function Header({ hideOnScroll = true }) {
           )}
 
           {/* Saudação do usuário */}
-          {user && (
+          {authenticatedUser && authenticatedUser.name && (
             <span className="hidden md:block text-sm text-navy-900 dark:text-white">
-              Olá, <strong>{user.name.split(" ")[0]}</strong>
+              Olá, <strong>{authenticatedUser.name.split(" ")[0]}</strong>
             </span>
           )}
 

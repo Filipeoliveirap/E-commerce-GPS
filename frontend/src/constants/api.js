@@ -8,12 +8,14 @@ export const UsersEndpoit = {
     UPDATE_PASSWORD: "/api/users/senha",
     CAMPOS_REAIS: "/api/users/reais",
     DELETE_ACCOUNT: "/api/users/conta",
-    
 };
 
 export const ProductsEndpoint = {
-  PAGED: "/products/paged",
-  UPDATE_PRODUCT: "/products/{id}",
-  CADASTRO: "/products",
+    GET_ALL: "/products",
+    GET_PAGED: "/products/paged",
+    GET_BY_ID: "/products/:id",
+    GET_BY_CATEGORY: "/products/category/:category",
+    CREATE: "/products",
+    UPDATE: "/products/:id",
+    DELETE: "/products/:id",
 };
-

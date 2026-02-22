@@ -1,6 +1,7 @@
 package com.backend.business.DTO.UserDTOs;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdatePerfilRequestDTO {
 
-    @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
+
+   @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
     @Pattern(
             regexp = "^[A-Za-zÀ-ú]+(?: [A-Za-zÀ-ú]+)*$",
             message = "Nome deve conter apenas letras e espaços simples entre palavras, sem espaços no início ou no final"

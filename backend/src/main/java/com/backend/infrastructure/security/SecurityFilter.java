@@ -40,22 +40,21 @@ String token = recoverToken(request);
 if (token != null) {
 String login = tokenService.validateToken(token);
 
-
-UserDetails user = repository.findByEmail(login)
-.orElseThrow(() ->
-new RuntimeException("Usuário não encontrado")
-);
-
-
-var authentication =
-new UsernamePasswordAuthenticationToken(
-user,
-null,
-user.getAuthorities()
-);
-
-
-SecurityContextHolder.getContext().setAuthentication(authentication);
+if (login != null && !login.isEmpty()) {
+    var maybeUser = repository.findByEmail(login.trim().toLowerCase());
+    if (maybeUser.isPresent()) {
+        UserDetails user = maybeUser.get();
+        
+        var authentication =
+                new UsernamePasswordAuthenticationToken(
+                        user,
+                        null,
+                        user.getAuthorities()
+                );
+        
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+}
 }
 
 

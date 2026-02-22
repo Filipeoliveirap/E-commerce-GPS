@@ -25,7 +25,7 @@ export function useProfile() {
     if (!token) return;
     try {
       setLoading(true);
-      const profileData = await getProfile(token);
+      const profileData = await getProfile();
       updateUser(profileData);
     } catch (err) {
       toast.error(err.message);
@@ -38,7 +38,7 @@ export function useProfile() {
     async (data) => {
       try {
         setLoading(true);
-        const updatedUser = await updateProfile(data, token);
+        const updatedUser = await updateProfile(data);
         updateUser(updatedUser);
         toast.success("Perfil atualizado com sucesso!");
         return true;
@@ -49,7 +49,7 @@ export function useProfile() {
         setLoading(false);
       }
     },
-    [token, updateUser],
+    [updateUser],
   );
 
   const handleUpdatePassword = useCallback(
@@ -61,7 +61,7 @@ export function useProfile() {
 
       try {
         setLoading(true);
-        await updatePassword(password, token);
+        await updatePassword(password);
         toast.success("Senha alterada com sucesso!");
         return true;
       } catch (err) {
@@ -71,14 +71,14 @@ export function useProfile() {
         setLoading(false);
       }
     },
-    [token],
+    [],
   );
 
   const fetchCamposReais = useCallback(async () => {
     if (!token) return;
     try {
       setLoading(true);
-      const data = await getCamposReais(token);
+      const data = await getCamposReais();
       setCamposReais(data);
     } catch (err) {
       toast.error(err.message);
@@ -86,11 +86,10 @@ export function useProfile() {
       setLoading(false);
     }
   }, [token]);
-
   const handleDeleteAccount = useCallback(async () => {
     try {
       setLoading(true);
-      await deleteAccount(token);
+      await deleteAccount();
       logout();
       toast.success("Conta deletada com sucesso!");
       navigate("/");
@@ -99,7 +98,7 @@ export function useProfile() {
     } finally {
       setLoading(false);
     }
-  }, [token, logout, navigate]);
+  }, [logout, navigate]);
 
   const handleLogout = useCallback(() => {
     logout();

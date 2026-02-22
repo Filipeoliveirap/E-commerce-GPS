@@ -1,25 +1,17 @@
 import { api } from "./api";
 import { UsersEndpoit } from "../constants/api";
 
-export async function getProfile(token) {
+export async function getProfile() {
   try {
-    const response = await api.get(UsersEndpoit.GET_PROFILE, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get(UsersEndpoit.GET_PROFILE);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Erro ao buscar perfil.");
   }
 }
-export async function updateProfile(data, token) {
+export async function updateProfile(data) {
   try {
-    const response = await api.put(UsersEndpoit.UPDATE_PROFILE, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.put(UsersEndpoit.UPDATE_PROFILE, data);
     return response.data;
   } catch (error) {
     throw new Error(
@@ -28,14 +20,11 @@ export async function updateProfile(data, token) {
   }
 }
 
-export async function updatePassword(newPassword, token) {
+export async function updatePassword(newPassword) {
   try {
     const response = await api.put(
       UsersEndpoit.UPDATE_PASSWORD,
       { newPassword },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
     );
     return response.data;
   } catch (error) {
@@ -45,13 +34,9 @@ export async function updatePassword(newPassword, token) {
   }
 }
 
-export const getCamposReais = async (token) => {
+export const getCamposReais = async () => {
   try {
-    const response = await api.get(UsersEndpoit.CAMPOS_REAIS, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+    const response = await api.get(UsersEndpoit.CAMPOS_REAIS);
     return response.data; 
   } catch (error) {
     console.error("Erro ao buscar campos reais:", error);
@@ -59,12 +44,11 @@ export const getCamposReais = async (token) => {
   }
 };
 
-export async function deleteAccount(token) {
+export async function deleteAccount() {
   try {
     const response = await api({
       method: 'delete',
       url: UsersEndpoit.DELETE_ACCOUNT,
-      headers: { Authorization: `Bearer ${token}` },
       data: { confirmed: true },
     });
     return response.data;

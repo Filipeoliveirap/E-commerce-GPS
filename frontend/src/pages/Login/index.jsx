@@ -54,7 +54,11 @@ export default function Login() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      const success = await handleLogin(formData.email, formData.password);
+      const success = await handleLogin(
+        formData.email,
+        formData.password,
+        formData.rememberMe,
+      );
       if (success) {
         navigate("/produtos");
       } else if (loginError) {
@@ -115,13 +119,17 @@ export default function Login() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
               <Input
                 label="E-mail"
-                icon="alternate_email"
+                icon="mail"
                 name="email"
                 type="text"
                 placeholder="seu@email.com"
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 value={formData.email}
                 onChange={handleInputChange}
                 error={errors.email}
@@ -133,6 +141,7 @@ export default function Login() {
                 name="password"
                 placeholder="Sua senha"
                 type={showPassword ? "text" : "password"}
+                autoComplete="off"
                 value={formData.password}
                 onChange={handleInputChange}
                 error={errors.password}

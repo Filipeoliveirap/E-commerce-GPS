@@ -12,7 +12,7 @@ public class UserMapper {
     public User toEntity(RegisterRequestDTO dto) {
         return User.builder()
                 .name(dto.getName())
-                .email(dto.getEmail())
+                .email(dto.getEmail().toLowerCase())
                 .password(dto.getPassword())
                 .cpf(dto.getCpf())
                 .role(dto.getRole())
@@ -43,7 +43,7 @@ public class UserMapper {
                 user.getName(),
                 MaskUtils.maskEmail(user.getEmail()),
                 MaskUtils.maskcpf(user.getCpf()),
-                user.getRole().name(),
+                user.getRole() != null ? user.getRole().name() : "USER",
                 MaskUtils.maskTelephone(user.getTelephone()));
     }
 
