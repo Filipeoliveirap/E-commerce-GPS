@@ -28,11 +28,11 @@ export async function updateProfile(data, token) {
   }
 }
 
-export async function updatePassword(newPassword, token) {
+export async function updatePassword(passwordData, token) {
   try {
     const response = await api.put(
       UsersEndpoit.UPDATE_PASSWORD,
-      { newPassword },
+      passwordData,
       {
         headers: { Authorization: `Bearer ${token}` },
       },

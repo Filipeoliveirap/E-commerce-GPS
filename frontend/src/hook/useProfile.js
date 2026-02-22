@@ -53,15 +53,19 @@ export function useProfile() {
   );
 
   const handleUpdatePassword = useCallback(
-    async (password) => {
-      if (!password) {
-        toast.error("Digite uma nova senha");
+    async (data) => {
+      const { currentPassword, newPassword } = data;
+
+      if (!currentPassword || !newPassword) {
+        toast.error("Preencha todos os campos");
         return false;
       }
 
       try {
         setLoading(true);
-        await updatePassword(password, token);
+
+        await updatePassword(data, token);
+
         toast.success("Senha alterada com sucesso!");
         return true;
       } catch (err) {

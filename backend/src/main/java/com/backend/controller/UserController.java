@@ -43,8 +43,8 @@ public class UserController {
             Authentication authentication,
             @Valid @RequestBody UpdatePasswordRequestDTO dto) {
         String emailUsuarioLogado = authentication.getName();
-        userService.updatePassword(emailUsuarioLogado, dto.getNewPassword());
-        return ResponseEntity.noContent().build(); // 204, sem retorno
+        userService.updatePassword(emailUsuarioLogado, dto);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/reais")

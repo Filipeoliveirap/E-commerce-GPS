@@ -4,6 +4,7 @@ import { useProfile } from "../../hook/useProfile";
 import { MaskUtils } from "../../utils/maskUtils";
 import { validators } from "../../utils/validators";
 import DeleteAccountModal from "../../components/molecules/DeleteAccountModal/DeleteAccountModal";
+import { toast } from "react-toastify";
 
 export default function PerfilUsuario() {
   const {
@@ -33,7 +34,12 @@ export default function PerfilUsuario() {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const [newPassword, setNewPassword] = useState("");
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
   const [editando, setEditando] = useState({
     name: false,
     email: false,
@@ -62,12 +68,27 @@ export default function PerfilUsuario() {
 
   // Alterna edição
   const toggleEdit = (campo) => {
-    setEditando((prev) => ({ ...prev, [campo]: !prev[campo] }));
+    setEditando((prev) => {
+      const novoEstado = !prev[campo];
 
-    setForm((prev) => ({
-      ...prev,
-      [campo]: prev[campo] || camposReais[campo] || user[campo],
-    }));
+      if (!novoEstado && campo === "password") {
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setMostrarSenha(false);
+      }
+
+      if (novoEstado) {
+        setForm((f) => ({
+          ...f,
+          [campo]: camposReais[campo] || user[campo] || "",
+        }));
+      }
+
+      return { ...prev, [campo]: novoEstado };
+    });
   };
 
   // Alterna visibilidade da senha
@@ -83,7 +104,7 @@ export default function PerfilUsuario() {
     );
 
     if (camposEditados.length === 0) {
-      alert("Nenhuma alteração para salvar");
+      toast.warning("Nenhuma alteração para salvar");
       return;
     }
 
@@ -96,25 +117,25 @@ export default function PerfilUsuario() {
       switch (campo) {
         case "email":
           if (!validators.email(valor)) {
-            alert("E-mail inválido");
+            toast.warning("E-mail inválido");
             return;
           }
           break;
         case "name":
           if (!validators.name(valor)) {
-            alert("Nome inválido");
+            toast.warning("Nome inválido");
             return;
           }
           break;
         case "cpf":
           if (!validators.cpf(valor)) {
-            alert("CPF inválido");
+            toast.warning("CPF inválido");
             return;
           }
           break;
         case "telephone":
           if (!validators.phone(valor)) {
-            alert("Telefone inválido");
+            toast.warning("Telefone inválido");
             return;
           }
           break;
@@ -169,17 +190,41 @@ export default function PerfilUsuario() {
 
   // Salva nova senha
   const handleSaveSenha = async () => {
-    if (!validators.password(newPassword)) {
-      alert("A senha deve ter no mínimo 6 caracteres");
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
+
+    if (!currentPassword) {
+      toast.warning("Informe a senha atual");
       return;
     }
 
-    const sucesso = await handleUpdatePassword(newPassword);
+    if (!validators.password(newPassword)) {
+      toast.warning("Nova senha deve ter no mínimo 6 caracteres");
+      return;
+    }
 
-    if (sucesso) {
-      setNewPassword("");
-      setEditando((prev) => ({ ...prev, password: false }));
-      setMostrarSenha(false);
+    if (newPassword !== confirmPassword) {
+      toast.warning("As senhas não coincidem");
+      return;
+    }
+
+    try {
+      const sucesso = await handleUpdatePassword({
+        currentPassword,
+        newPassword,
+      });
+
+      if (sucesso) {
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        setEditando((prev) => ({ ...prev, password: false }));
+        setMostrarSenha(false);
+      }
+    } catch {
+      // o hook já exibe o toast
     }
   };
 
@@ -269,7 +314,12 @@ export default function PerfilUsuario() {
             <button
               className="btn-save"
               onClick={handleSave}
-              disabled={loading || Object.values(errors).some((e) => e !== "")}
+              disabled={
+                loading ||
+                Object.entries(errors)
+                  .filter(([key]) => key !== "password")
+                  .some(([, val]) => val !== "")
+              }
             >
               {loading ? "Atualizando..." : "Salvar Alterações"}
             </button>
@@ -357,52 +407,90 @@ export default function PerfilUsuario() {
             {/* Senha */}
             <div className="form-group">
               <label>Senha</label>
+
               <div className="input-edit-wrapper">
                 <input
                   type={mostrarSenha ? "text" : "password"}
-                  value={newPassword}
+                  placeholder="Senha atual"
+                  value={passwordForm.currentPassword}
                   disabled={!editando.password}
-                  placeholder={
-                    editando.password ? "Digite uma nova senha" : "********"
+                  onChange={(e) =>
+                    setPasswordForm((p) => ({
+                      ...p,
+                      currentPassword: e.target.value,
+                    }))
                   }
-                  onChange={(e) => setNewPassword(e.target.value)}
                 />
-                <div className="btn-wrapper">
-                  {editando.password && (
-                    <>
-                      <button
-                        type="button"
-                        className="btn-edit"
-                        onClick={toggleMostrarSenha}
-                      >
-                        {mostrarSenha ? "Ocultar" : "Mostrar"}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-edit"
-                        onClick={() => toggleEdit("password")}
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-save"
-                        onClick={handleSaveSenha}
-                      >
-                        Salvar
-                      </button>
-                    </>
-                  )}
-                  {!editando.password && (
+              </div>
+
+              {editando.password && (
+                <>
+                  <div className="input-edit-wrapper">
+                    <input
+                      type={mostrarSenha ? "text" : "password"}
+                      placeholder="Nova senha"
+                      value={passwordForm.newPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          newPassword: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="input-edit-wrapper">
+                    <input
+                      type={mostrarSenha ? "text" : "password"}
+                      placeholder="Confirmar nova senha"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          confirmPassword: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="btn-wrapper">
+                {editando.password ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn-edit"
+                      onClick={toggleMostrarSenha}
+                    >
+                      {mostrarSenha ? "Ocultar" : "Mostrar"}
+                    </button>
+
                     <button
                       type="button"
                       className="btn-edit"
                       onClick={() => toggleEdit("password")}
                     >
-                      Editar
+                      Cancelar
                     </button>
-                  )}
-                </div>
+
+                    <button
+                      type="button"
+                      className="btn-save"
+                      onClick={handleSaveSenha}
+                    >
+                      Salvar
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn-edit"
+                    onClick={() => toggleEdit("password")}
+                  >
+                    Editar
+                  </button>
+                )}
               </div>
             </div>
           </form>
