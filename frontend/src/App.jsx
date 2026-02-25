@@ -6,9 +6,10 @@ import Home from "./pages/Home";
 import Cadastro from "./pages/Cadastro";
 import Login from "./pages/Login";
 import Produtos from "./pages/Produtos";
-import Header from "./components/molecules/Header";
 import "./App.css";
 import PerfilUsuario from "./pages/Perfil/VisualizarPerfil";
+import Carrinho from "./pages/Carrinho";
+import AdicionarProduto from "./pages/AdicionarProduto";
 
 export default function App() {
   return (
@@ -18,6 +19,8 @@ export default function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/login" element={<Login />} />
         <Route path="/produtos" element={<Produtos />} />
+        <Route path="/produtos/adicionar" element={<AdicionarProduto />} />
+        <Route path="/carrinho" element={<Carrinho />} />
         <Route path="/perfil" element={<PerfilUsuario />} />
       </Routes>
 

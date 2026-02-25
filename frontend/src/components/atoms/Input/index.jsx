@@ -8,6 +8,22 @@ export default function Input({
   trailing = null,
   ...props
 }) {
+  const handleInputChange = (event) => {
+    if (!onChange) return;
+
+    const inputType = props.type ?? "text";
+    const shouldTrimLeadingSpace = ["text", "email", "password", "search", "tel", "url"].includes(inputType);
+
+    if (shouldTrimLeadingSpace && typeof event.target?.value === "string") {
+      const sanitizedValue = event.target.value.replace(/^\s+/, "");
+      if (sanitizedValue !== event.target.value) {
+        event.target.value = sanitizedValue;
+      }
+    }
+
+    onChange(event);
+  };
+
   return (
     <div className="space-y-1.5">
       {label && (
@@ -38,7 +54,7 @@ export default function Input({
           `}
           name={name}
           value={value}
-          onChange={onChange}
+          onChange={handleInputChange}
           {...props}
         />
 

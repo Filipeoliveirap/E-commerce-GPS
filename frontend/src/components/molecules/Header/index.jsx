@@ -1,19 +1,20 @@
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import Icon from "../../atoms/Icon";
 import Button from "../../atoms/Button";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hook/useAuth";
 import { useTheme } from "../../../hook/useTheme";
+import { useCartStore } from "../../../store/cartStore";
 
 export default function Header({ hideOnScroll = true }) {
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartCount, setCartCount] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const location = useLocation();
   const { user, isAuthenticated, handleLogout } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
+  const cartCount = useCartStore((state) => state.totalItems);
 
   const authenticatedUser = isAuthenticated ? user : null;
 
@@ -125,16 +126,24 @@ export default function Header({ hideOnScroll = true }) {
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="md"
-            icon="shopping_cart"
-            className="relative text-navy-900 dark:text-white"
-          >
-            {cartCount > 0 && (
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white dark:border-navy-800"></span>
-            )}
-          </Button>
+          <Link to="/produtos" className="lg:hidden">
+            <Button variant="ghost" size="md" icon="storefront" className="text-navy-900 dark:text-white" />
+          </Link>
+
+          <Link to="/carrinho">
+            <Button
+              variant="ghost"
+              size="md"
+              icon="shopping_cart"
+              className="relative text-navy-900 dark:text-white"
+            >
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-primary rounded-full border-2 border-white dark:border-navy-800 text-[10px] font-bold text-navy-900 flex items-center justify-center">
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
+            </Button>
+          </Link>
 
           {/* Settings Dropdown */}
           <div className="relative settings-dropdown" ref={settingsDropdownRef}>

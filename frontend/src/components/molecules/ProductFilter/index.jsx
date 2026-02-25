@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 export default function ProductFilter({ onFilterChange }) {
   const [filters, setFilters] = useState({
-    priceRange: [0, 5000],
+    priceRange: [0, 100000],
     category: '',
     rating: 0,
     inStock: true
@@ -43,7 +43,7 @@ export default function ProductFilter({ onFilterChange }) {
         <input
           type="range"
           min="0"
-          max="5000"
+          max="100000"
           value={filters.priceRange[1]}
           onChange={handlePriceChange}
           className="w-full accent-primary"

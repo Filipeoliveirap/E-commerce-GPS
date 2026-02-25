@@ -34,8 +34,13 @@ export default function Home() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Link to="/produtos">
+              <Button variant="primary" size="lg" icon="storefront">
+                Ver Produtos
+              </Button>
+            </Link>
             <Link to="/cadastro">
-              <Button variant="primary" size="lg" icon="person_add">
+              <Button variant="secondary" size="lg" icon="person_add">
                 Criar Conta
               </Button>
             </Link>

@@ -1,12 +1,17 @@
 import { api } from "./api";
 
-export async function getProductsPaged(page = 0, size = 8) {
+function buildAuthHeaders(token) {
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function getProductsPaged(page = 0, size = 8, token) {
   try {
     const response = await api.get(`/products/paged`, {
       params: {
         page,
         size
-      }
+      },
+      headers: buildAuthHeaders(token),
     });
     return {
       content: response.data.content,
@@ -25,9 +30,11 @@ export async function getProductsPaged(page = 0, size = 8) {
   }
 }
 
-export async function getProductsByCategory(category) {
+export async function getProductsByCategory(category, token) {
   try {
-    const response = await api.get(`/products/category/${category}`);
+    const response = await api.get(`/products/category/${category}`, {
+      headers: buildAuthHeaders(token),
+    });
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -38,9 +45,11 @@ export async function getProductsByCategory(category) {
   }
 }
 
-export async function getProductById(id) {
+export async function getProductById(id, token) {
   try {
-    const response = await api.get(`/products/${id}`);
+    const response = await api.get(`/products/${id}`, {
+      headers: buildAuthHeaders(token),
+    });
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -51,9 +60,11 @@ export async function getProductById(id) {
   }
 }
 
-export async function getAllProducts() {
+export async function getAllProducts(token) {
   try {
-    const response = await api.get(`/products`);
+    const response = await api.get(`/products`, {
+      headers: buildAuthHeaders(token),
+    });
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -64,9 +75,11 @@ export async function getAllProducts() {
   }
 }
 
-export async function createProduct(productData) {
+export async function createProduct(productData, token) {
   try {
-    const response = await api.post(`/products`, productData);
+    const response = await api.post(`/products`, productData, {
+      headers: buildAuthHeaders(token),
+    });
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -77,9 +90,16 @@ export async function createProduct(productData) {
   }
 }
 
-export async function updateProduct(id, productData) {
+export async function updateProduct(idOrData, productDataOrToken, maybeToken) {
+  const isObjectStyle = typeof idOrData === "object" && idOrData !== null;
+  const id = isObjectStyle ? idOrData.id : idOrData;
+  const productData = isObjectStyle ? idOrData : productDataOrToken;
+  const token = isObjectStyle ? productDataOrToken : maybeToken;
+
   try {
-    const response = await api.put(`/products/${id}`, productData);
+    const response = await api.put(`/products/${id}`, productData, {
+      headers: buildAuthHeaders(token),
+    });
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -90,9 +110,11 @@ export async function updateProduct(id, productData) {
   }
 }
 
-export async function deleteProduct(id) {
+export async function deleteProduct(id, token) {
   try {
-    const response = await api.delete(`/products/${id}`);
+    const response = await api.delete(`/products/${id}`, {
+      headers: buildAuthHeaders(token),
+    });
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {

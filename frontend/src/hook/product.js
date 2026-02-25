@@ -3,9 +3,45 @@ import { toast } from "react-toastify";
 import { useAuthStore } from "../store/authStore";
 import {
   getProductsPaged,
+  getAllProducts,
   createProduct,
   updateProduct,
 } from "../service/productService";
+
+function normalizeProduct(rawProduct) {
+  const source = rawProduct && typeof rawProduct === "object" ? rawProduct : {};
+
+  const id =
+    source.id ??
+    source._id ??
+    source.productId ??
+    source.codigo ??
+    null;
+
+  return {
+    ...source,
+    id,
+    name: source.name ?? source.nome ?? source.title ?? "Produto sem nome",
+    description: source.description ?? source.descricao ?? "",
+    price: Number(source.price ?? source.preco ?? 0),
+    originalPrice:
+      source.originalPrice != null
+        ? Number(source.originalPrice)
+        : source.precoOriginal != null
+        ? Number(source.precoOriginal)
+        : null,
+    image: source.image ?? source.imageUrl ?? source.thumbnail ?? "",
+    category: source.category ?? source.categoria ?? "",
+    inStock:
+      source.inStock != null
+        ? Boolean(source.inStock)
+        : source.stock != null
+        ? Number(source.stock) > 0
+        : true,
+    rating: Number(source.rating ?? source.avaliacao ?? 0),
+    reviews: Number(source.reviews ?? source.avaliacoes ?? 0),
+  };
+}
 
 export function useProducts() {
   const { token } = useAuthStore();
@@ -30,7 +66,7 @@ export function useProducts() {
 
         const data = await getProductsPaged(page, pageInfo.size, token);
 
-        setProducts(data.content);
+        setProducts((data.content || []).map(normalizeProduct));
 
         setPageInfo({
           page: data.page,
@@ -39,7 +75,20 @@ export function useProducts() {
           last: data.last,
         });
       } catch (err) {
-        toast.error(err.message);
+        try {
+          const allProducts = await getAllProducts(token);
+          const normalizedProducts = (Array.isArray(allProducts) ? allProducts : []).map(normalizeProduct);
+
+          setProducts(normalizedProducts);
+          setPageInfo({
+            page: 0,
+            size: normalizedProducts.length,
+            totalPages: normalizedProducts.length > 0 ? 1 : 0,
+            last: true,
+          });
+        } catch {
+          toast.error(err.message);
+        }
       } finally {
         setLoading(false);
       }
