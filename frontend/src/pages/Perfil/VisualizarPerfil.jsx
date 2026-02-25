@@ -4,6 +4,7 @@ import { useProfile } from "../../hook/useProfile";
 import { MaskUtils } from "../../utils/maskUtils";
 import { validators } from "../../utils/validators";
 import DeleteAccountModal from "../../components/molecules/DeleteAccountModal/DeleteAccountModal";
+import { toast } from "react-toastify";
 
 export default function PerfilUsuario() {
   const {
@@ -24,7 +25,11 @@ export default function PerfilUsuario() {
     telephone: user?.telephone || "",
   });
 
-  const [newPassword, setNewPassword] = useState("");
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [editando, setEditando] = useState({
     name: false,
     email: false,
@@ -32,8 +37,6 @@ export default function PerfilUsuario() {
     telephone: false,
     password: false,
   });
-
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
@@ -73,24 +76,28 @@ export default function PerfilUsuario() {
   }, [camposReais]);
 
   // Alterna edição
-  const toggleEdit = async (campo) => {
-    // Se estamos habilitando edição (mudando para true) e é um campo mascarado
-    if (!editando[campo] && ["email", "cpf", "telephone"].includes(campo)) {
-      // Garante que temos os valores reais carregados
-      if (!camposReais[campo]) {
-        await fetchCamposReais();
+  const toggleEdit = (campo) => {
+    setEditando((prev) => {
+      const novoEstado = !prev[campo];
+
+      if (!novoEstado && campo === "password") {
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setMostrarSenha(false);
       }
-    }
 
-    setEditando((prev) => ({ ...prev, [campo]: !prev[campo] }));
+      if (novoEstado) {
+        setForm((f) => ({
+          ...f,
+          [campo]: camposReais[campo] || user[campo] || "",
+        }));
+      }
 
-    // Atualiza o form com o valor real se há
-    if (!editando[campo] && camposReais[campo]) {
-      setForm((prev) => ({
-        ...prev,
-        [campo]: camposReais[campo],
-      }));
-    }
+      return { ...prev, [campo]: novoEstado };
+    });
   };
 
   // Função para aplicar máscara enquanto digita
@@ -112,19 +119,49 @@ export default function PerfilUsuario() {
   const handleSave = async () => {
     if (!user) return;
 
-    // Verifica se algum campo foi editado
-    const algumCampoEditado = Object.values(editando).some(val => val === true);
-    if (!algumCampoEditado) {
-      alert("Nenhum campo foi editado");
+    // Descobre quais campos estão em edição
+    const camposEditados = Object.keys(editando).filter(
+      (campo) => editando[campo] && campo !== "password",
+    );
+
+    if (camposEditados.length === 0) {
+      toast.warning("Nenhuma alteração para salvar");
       return;
     }
 
-    // 🔴 Validações (apenas dos campos que foram editados)
-    
-    if (editando.name && form.name.trim()) {
-      if (!validators.name(form.name)) {
-        alert("Nome inválido - use apenas letras e espaços");
-        return;
+    const formParaEnvio = {};
+
+    // Valida SOMENTE os campos editados
+    for (const campo of camposEditados) {
+      const valor = form[campo];
+
+      switch (campo) {
+        case "email":
+          if (!validators.email(valor)) {
+            toast.warning("E-mail inválido");
+            return;
+          }
+          break;
+        case "name":
+          if (!validators.name(valor)) {
+            toast.warning("Nome inválido");
+            return;
+          }
+          break;
+        case "cpf":
+          if (!validators.cpf(valor)) {
+            toast.warning("CPF inválido");
+            return;
+          }
+          break;
+        case "telephone":
+          if (!validators.phone(valor)) {
+            toast.warning("Telefone inválido");
+            return;
+          }
+          break;
+        default:
+          break;
       }
     }
 
@@ -150,9 +187,6 @@ export default function PerfilUsuario() {
         return;
       }
     }
-
-    // Monta o objeto com apenas os campos que foram editados
-    const formParaEnvio = {};
 
     if (editando.name) {
       formParaEnvio.name = form.name.trim();
@@ -212,17 +246,41 @@ export default function PerfilUsuario() {
 
   // Salva nova senha
   const handleSaveSenha = async () => {
-    if (!validators.password(newPassword)) {
-      alert("A senha deve ter no mínimo 6 caracteres");
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
+
+    if (!currentPassword) {
+      toast.warning("Informe a senha atual");
       return;
     }
 
-    const sucesso = await handleUpdatePassword(newPassword);
+    if (!validators.password(newPassword)) {
+      toast.warning("Nova senha deve ter no mínimo 6 caracteres");
+      return;
+    }
 
-    if (sucesso) {
-      setNewPassword("");
-      setEditando((prev) => ({ ...prev, password: false }));
-      setMostrarSenha(false);
+    if (newPassword !== confirmPassword) {
+      toast.warning("As senhas não coincidem");
+      return;
+    }
+
+    try {
+      const sucesso = await handleUpdatePassword({
+        currentPassword,
+        newPassword,
+      });
+
+      if (sucesso) {
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        setEditando((prev) => ({ ...prev, password: false }));
+        setMostrarSenha(false);
+      }
+    } catch {
+      // o hook já exibe o toast
     }
   };
 
@@ -371,52 +429,90 @@ export default function PerfilUsuario() {
             {/* Senha */}
             <div className="form-group">
               <label>Senha</label>
+
               <div className="input-edit-wrapper">
                 <input
                   type={mostrarSenha ? "text" : "password"}
-                  value={newPassword}
+                  placeholder="Senha atual"
+                  value={passwordForm.currentPassword}
                   disabled={!editando.password}
-                  placeholder={
-                    editando.password ? "Digite uma nova senha" : "********"
+                  onChange={(e) =>
+                    setPasswordForm((p) => ({
+                      ...p,
+                      currentPassword: e.target.value,
+                    }))
                   }
-                  onChange={(e) => setNewPassword(e.target.value)}
                 />
-                <div className="btn-wrapper">
-                  {editando.password && (
-                    <>
-                      <button
-                        type="button"
-                        className="btn-edit"
-                        onClick={toggleMostrarSenha}
-                      >
-                        {mostrarSenha ? "Ocultar" : "Mostrar"}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-edit"
-                        onClick={() => toggleEdit("password")}
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-save"
-                        onClick={handleSaveSenha}
-                      >
-                        Salvar
-                      </button>
-                    </>
-                  )}
-                  {!editando.password && (
+              </div>
+
+              {editando.password && (
+                <>
+                  <div className="input-edit-wrapper">
+                    <input
+                      type={mostrarSenha ? "text" : "password"}
+                      placeholder="Nova senha"
+                      value={passwordForm.newPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          newPassword: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="input-edit-wrapper">
+                    <input
+                      type={mostrarSenha ? "text" : "password"}
+                      placeholder="Confirmar nova senha"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          confirmPassword: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="btn-wrapper">
+                {editando.password ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn-edit"
+                      onClick={toggleMostrarSenha}
+                    >
+                      {mostrarSenha ? "Ocultar" : "Mostrar"}
+                    </button>
+
                     <button
                       type="button"
                       className="btn-edit"
                       onClick={() => toggleEdit("password")}
                     >
-                      Editar
+                      Cancelar
                     </button>
-                  )}
-                </div>
+
+                    <button
+                      type="button"
+                      className="btn-save"
+                      onClick={handleSaveSenha}
+                    >
+                      Salvar
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn-edit"
+                    onClick={() => toggleEdit("password")}
+                  >
+                    Editar
+                  </button>
+                )}
               </div>
             </div>
           </form>

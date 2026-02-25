@@ -20,12 +20,13 @@ export async function updateProfile(data) {
   }
 }
 
-export async function updatePassword(newPassword) {
+export async function updatePassword(passwordData, token) {
   try {
-    const response = await api.put(
-      UsersEndpoit.UPDATE_PASSWORD,
-      { newPassword },
-    );
+    const config = token
+      ? { headers: { Authorization: `Bearer ${token}` } }
+      : undefined;
+
+    const response = await api.put(UsersEndpoit.UPDATE_PASSWORD, passwordData, config);
     return response.data;
   } catch (error) {
     throw new Error(

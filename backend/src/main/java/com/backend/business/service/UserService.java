@@ -110,11 +110,21 @@ public class UserService {
         return userMapper.toUserProfileResponse(user);
     }
 
-    public void updatePassword(String emailUsuarioLogado, String novaSenha) {
+    public void updatePassword(String emailUsuarioLogado, UpdatePasswordRequestDTO dto) {
+
         User user = repository.findByEmail(emailUsuarioLogado)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        user.setPassword(passwordEncoder.encode(novaSenha));
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+
+        if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Nova senha deve ser diferente da atual");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+
         repository.save(user);
     }
 
