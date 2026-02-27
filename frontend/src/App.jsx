@@ -10,6 +10,8 @@ import "./App.css";
 import PerfilUsuario from "./pages/Perfil/VisualizarPerfil";
 import Carrinho from "./pages/Carrinho";
 import AdicionarProduto from "./pages/AdicionarProduto";
+import AddressPage from "./pages/AddressPage/AddressPage";
+import PaymentPage from "./pages/Checkout/payment";
 
 export default function App() {
   return (
@@ -22,6 +24,9 @@ export default function App() {
         <Route path="/produtos/adicionar" element={<AdicionarProduto />} />
         <Route path="/carrinho" element={<Carrinho />} />
         <Route path="/perfil" element={<PerfilUsuario />} />
+        <Route path="/endereco/cadastrar" element={<AddressPage />} />
+        <Route path="/checkout" element={<PaymentPage />} />
+
       </Routes>
 
       <ToastContainer

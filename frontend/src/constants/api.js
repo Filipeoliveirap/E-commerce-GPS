@@ -19,3 +19,12 @@ export const ProductsEndpoint = {
     UPDATE: "/products/:id",
     DELETE: "/products/:id",
 };
+
+export const CheckoutEndpoint = {
+  CHECKOUT: "/api/checkout",
+};
+
+export const AddressEndpoint = {
+  CREATE: "/api/address",
+  FIND_ADDRESSES: "/api/address/has",
+};

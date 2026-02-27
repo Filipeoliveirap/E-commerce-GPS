@@ -3,6 +3,7 @@ import Footer from "../../components/organisms/Footer";
 import Text from "../../components/atoms/Text";
 import { useCartStore } from "../../store/cartStore";
 import { Link } from "react-router-dom";
+import { useCartCheckoutRedirect } from "../../hook/useCartCheckoutRedirect";
 
 function toCurrency(value) {
   return new Intl.NumberFormat("pt-BR", {
@@ -17,6 +18,7 @@ export default function Carrinho() {
   const deleteItem = useCartStore((state) => state.deleteItem);
   const addItem = useCartStore((state) => state.addItem);
   const clearCart = useCartStore((state) => state.clearCart);
+  const { handleFinalizePurchase } = useCartCheckoutRedirect();
 
   const totalItems = items.reduce((total, item) => total + Number(item.quantity ?? 0), 0);
   const totalValue = items.reduce(
@@ -178,6 +180,7 @@ export default function Carrinho() {
                 </div>
 
                 <button
+                  onClick={handleFinalizePurchase}
                   type="button"
                   className="w-full bg-primary text-navy-900 font-black py-3 rounded-xl hover:brightness-95 transition-all uppercase tracking-wider"
                 >
