@@ -1,4 +1,4 @@
-package com.backend.business.service;
+package com.backend.infrastructure.payment;
 
 import com.backend.business.DTO.checkoutDTO.BoletoData;
 import com.backend.infrastructure.model.Order;
@@ -17,7 +17,7 @@ public class BoletoGenerator {
 
         return BoletoData.builder()
                 .payerName(order.getCustomerName())
-                .companyName("FoodApp Company LTDA")
+                .companyName("TechWave Eletrônicos")
                 .amount(order.getTotalAmount())
                 .description(buildDescription(order))
                 .dueDate(LocalDate.now().plusDays(3))

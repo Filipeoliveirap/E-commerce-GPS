@@ -1,4 +1,4 @@
-package com.backend.business.DTO.paymentDTO;
+package com.backend.business.DTO.checkoutDTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -134,4 +134,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<?> handleAddressNotFound(AddressNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "error", "USER_WITHOUT_ADDRESS",
+                        "message", "Usuário precisa cadastrar endereço"
+                ));
+    }
+
 }

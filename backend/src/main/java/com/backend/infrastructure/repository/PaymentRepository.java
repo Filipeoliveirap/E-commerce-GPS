@@ -1,4 +1,7 @@
 package com.backend.infrastructure.repository;
 
-public interface PaymentRepository {
+import com.backend.infrastructure.model.Payment;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface PaymentRepository extends MongoRepository<Payment, String> {
 }
