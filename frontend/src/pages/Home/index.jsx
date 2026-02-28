@@ -25,7 +25,7 @@ export default function Home() {
           </div>
 
           <Text variant="h1" className="mb-6">
-            Bem-vindo à A.J.F. Eletrônicos
+            Bem-vindo à  TechWave Eletrônicos
           </Text>
 
           <Text variant="body" color="text-navy-700 dark:text-gray-300" className="text-lg md:text-xl mb-12 max-w-2xl mx-auto">
@@ -81,7 +81,7 @@ export default function Home() {
 
         {/* Footer */}
         <div className="absolute bottom-4 text-center w-full pointer-events-none">
-          <p className="text-[10px] text-navy-700/40 dark:text-white/20">© 2024 A.J.F. Eletrônicos - Atividade Acadêmica</p>
+          <p className="text-[10px] text-navy-700/40 dark:text-white/20">© 2024  TechWave Eletrônicos - Atividade Acadêmica</p>
         </div>
       </main>
     </div>
