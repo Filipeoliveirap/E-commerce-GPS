@@ -312,7 +312,7 @@ export default function PerfilUsuario() {
           <div className="logo">
             <div className="logo-icon">⚡</div>
             <h2>
-              A.J.F. <span>Eletrônicos</span>
+              TechWave. <span>Eletrônicos</span>
             </h2>
           </div>
           <input className="search" placeholder="Buscar produtos..." />
