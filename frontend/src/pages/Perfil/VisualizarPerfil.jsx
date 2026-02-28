@@ -521,7 +521,7 @@ export default function PerfilUsuario() {
       )}
 
       <footer className="footer">
-        <p>© 2024 A.J.F. Eletrônicos</p>
+        <p>© 2024 TechWave Eletrônicos</p>
       </footer>
 
       <DeleteAccountModal
