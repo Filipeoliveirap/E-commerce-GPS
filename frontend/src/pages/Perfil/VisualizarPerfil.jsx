@@ -312,7 +312,7 @@ export default function PerfilUsuario() {
           <div className="logo">
             <div className="logo-icon">⚡</div>
             <h2>
-              A.J.F. <span>Eletrônicos</span>
+              TechWave. <span>Eletrônicos</span>
             </h2>
           </div>
           <input className="search" placeholder="Buscar produtos..." />
@@ -521,7 +521,7 @@ export default function PerfilUsuario() {
       )}
 
       <footer className="footer">
-        <p>© 2024 A.J.F. Eletrônicos</p>
+        <p>© 2024 TechWave Eletrônicos</p>
       </footer>
 
       <DeleteAccountModal

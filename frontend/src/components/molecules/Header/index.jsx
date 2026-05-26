@@ -70,10 +70,10 @@ export default function Header({ hideOnScroll = true }) {
             </div>
             <div className="flex flex-col">
               <h2 className="text-xl font-bold tracking-tight text-navy-900 dark:text-white leading-none">
-                A.J.F.
+                 TechWave 
               </h2>
               <span className="text-[10px] uppercase font-bold text-navy-700 dark:text-gray-400 tracking-widest">
-                Eletrônicos
+                 Eletrônicos 
               </span>
             </div>
           </Link>

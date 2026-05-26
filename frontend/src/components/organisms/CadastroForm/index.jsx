@@ -120,7 +120,7 @@ export default function CadastroForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="mb-8">
         <h3 className="text-2xl font-bold text-navy-900 dark:text-white mb-2">
-          Criar conta A.J.F.
+          Criar conta TechWave Eletrônicos.
         </h3>
         <p className="text-navy-700 dark:text-gray-400 text-sm">
           Preencha seus dados para acessar nossa loja de eletrônicos.
@@ -224,7 +224,7 @@ export default function CadastroForm() {
             href="#"
             className="font-medium text-navy-900 dark:text-primary hover:underline"
           >
-            Termos da A.J.F.
+            Termos da TechWave Eletrônicos.
           </a>{" "}
           e{" "}
           <a
@@ -274,7 +274,7 @@ export default function CadastroForm() {
       {/* Login Link */}
       <div className="mt-6 text-center">
         <p className="text-xs text-navy-700 dark:text-gray-400">
-          Já tem conta na A.J.F.?{" "}
+          Já tem conta na TechWave Eletrônicos.?{" "}
           <Link
             to="/login"
             className="font-bold text-navy-900 dark:text-white hover:text-primary dark:hover:text-primary transition-colors"

@@ -306,7 +306,7 @@ export default function AddressPage() {
         className={`mt-20 py-10 border-t border-[${theme.colors.navy[200]}] text-center`}
       >
         <p className={`text-[${theme.colors.navy[400]}] text-sm`}>
-          © 2024 A.J.F. Eletrônicos Ltda. Todos os direitos reservados.
+          © 2024 TechWave Eletrônicos Ltda. Todos os direitos reservados.
         </p>
       </footer>
     </div>

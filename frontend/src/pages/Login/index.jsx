@@ -101,7 +101,7 @@ export default function Login() {
                 Bem-vindo de volta!
               </h2>
               <p className="text-gray-300 text-sm leading-relaxed">
-                Acesse sua conta na A.J.F. Eletrônicos para acompanhar seus
+                Acesse sua conta na TechWave Eletrônicos para acompanhar seus
                 pedidos, verificar seus pontos de fidelidade e aproveitar
                 ofertas exclusivas.
               </p>
@@ -112,7 +112,7 @@ export default function Login() {
           <div className="w-full md:w-3/5 p-8 md:p-12 flex flex-col justify-center">
             <div className="mb-8">
               <h3 className="text-2xl font-bold text-navy-900 dark:text-white mb-2">
-                Login A.J.F.
+                Login TechWave Eletrônicos.
               </h3>
               <p className="text-navy-700 dark:text-gray-400 text-sm">
                 Insira suas credenciais para acessar sua conta.
@@ -213,7 +213,7 @@ export default function Login() {
 
         <div className="absolute bottom-4 text-center w-full pointer-events-none">
           <p className="text-[10px] text-navy-700/40 dark:text-white/20">
-            © 2024 A.J.F. Eletrônicos - Atividade Acadêmica
+            © 2024 TechWave Eletrônicos - Atividade Acadêmica
           </p>
         </div>
       </main>

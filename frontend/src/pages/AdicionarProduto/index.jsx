@@ -142,7 +142,7 @@ export default function AdicionarProduto() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h2 className="text-3xl font-bold">Adicionar Produto</h2>
-            <p className="text-gray-500 dark:text-gray-400">Cadastre um novo item na loja A.J.F.</p>
+            <p className="text-gray-500 dark:text-gray-400">Cadastre um novo item na loja TechWave Eletrônicos.</p>
           </div>
           <div className="hidden md:flex items-center gap-3">
             <Link

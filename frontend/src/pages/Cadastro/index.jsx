@@ -31,7 +31,7 @@ export default function Cadastro() {
               </div>
               <h2 className="text-3xl font-bold leading-tight mb-4">A Tecnologia que Você Procura</h2>
               <p className="text-gray-300 text-sm leading-relaxed">
-                Na A.J.F. Eletrônicos, conectamos você aos lançamentos mais recentes. Crie sua conta para descontos em hardware, smartphones e periféricos.
+                Na TechWave Eletrônicos, conectamos você aos lançamentos mais recentes. Crie sua conta para descontos em hardware, smartphones e periféricos.
               </p>
             </div>
 
@@ -59,7 +59,7 @@ export default function Cadastro() {
 
         {/* Footer */}
         <div className="absolute bottom-4 text-center w-full pointer-events-none">
-          <p className="text-[10px] text-navy-700/40 dark:text-white/20">© 2024 A.J.F. Eletrônicos - Atividade Acadêmica</p>
+          <p className="text-[10px] text-navy-700/40 dark:text-white/20">© 2024 TechWave Eletrônicos - Atividade Acadêmica</p>
         </div>
       </main>
     </div>
