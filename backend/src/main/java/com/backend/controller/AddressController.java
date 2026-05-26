@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/address")
 @RequiredArgsConstructor
@@ -33,5 +35,12 @@ public class AddressController {
         String email = authentication.getName();
         boolean hasAddress = addressService.userHasAddress(email);
         return ResponseEntity.ok(hasAddress);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AddressResponseDTO>> getUserAddresses(Authentication auth) {
+        return ResponseEntity.ok(
+                addressService.getUserAddresses(auth.getName())
+        );
     }
 }

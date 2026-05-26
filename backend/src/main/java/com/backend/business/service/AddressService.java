@@ -10,6 +10,8 @@ import com.backend.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AddressService {
@@ -38,5 +40,15 @@ public class AddressService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         return addressRepository.findByUserId(user.getId()).isPresent();
+    }
+
+    public List<AddressResponseDTO> getUserAddresses(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return addressRepository.findByUserId(user.getId())
+                .stream()
+                .map(addressMapper::toResponse)
+                .toList();
     }
 }
