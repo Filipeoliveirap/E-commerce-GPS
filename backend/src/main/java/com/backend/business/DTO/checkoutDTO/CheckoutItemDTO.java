@@ -9,7 +9,7 @@ import lombok.Data;
 public class CheckoutItemDTO {
 
     @NotBlank
-    private String productId;
+    private Long productId;
 
     @NotNull
     @Positive

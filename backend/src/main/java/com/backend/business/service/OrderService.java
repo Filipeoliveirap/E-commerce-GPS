@@ -20,12 +20,13 @@ public class OrderService {
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
-    public String createOrder(String email, CheckoutRequestDTO dto) {
+    public Long createOrder(String email, CheckoutRequestDTO dto) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         Address address = addressRepository.findByUserId(user.getId())
+                .stream().findFirst()
                 .orElseThrow(AddressNotFoundException::new);
 
         List<OrderItem> orderItems = new ArrayList<>();

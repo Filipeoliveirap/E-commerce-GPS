@@ -1,7 +1,7 @@
 package com.backend.business.DTO.UserDTOs;
 
 public record UserProfileResponseDTO(
-        String id,
+        Long id,
         String name,
         String email,
         String cpf,

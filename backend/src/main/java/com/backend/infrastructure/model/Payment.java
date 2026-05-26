@@ -1,15 +1,12 @@
 package com.backend.infrastructure.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "payments")
+@Entity
+@Table(name = "payments")
 @Data
 @Builder
 @AllArgsConstructor
@@ -17,19 +14,22 @@ import java.time.LocalDateTime;
 public class Payment {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String orderId;
+    @Column(name = "order_id")
+    private Long orderId;
 
     private String method;
-
     private Double amount;
-
     private String status;
 
+    @Column(name = "pix_key")
     private String pixKey;
 
+    @Column(name = "boleto_pdf_base64", columnDefinition = "TEXT")
     private String boletoPdfBase64;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }

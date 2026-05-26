@@ -19,7 +19,7 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
 
-    public CheckoutResponseDTO generatePayment(String orderId, String method) {
+    public CheckoutResponseDTO generatePayment(Long orderId, String method) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
@@ -27,7 +27,6 @@ public class PaymentService {
         Payment payment;
 
         if ("PIX".equalsIgnoreCase(method)) {
-
             payment = Payment.builder()
                     .orderId(order.getId())
                     .method("PIX")
@@ -38,7 +37,6 @@ public class PaymentService {
                     .build();
 
         } else if ("BOLETO".equalsIgnoreCase(method)) {
-
             byte[] pdfBytes = BoletoPdfGenerator.generate(order);
             String base64Pdf = Base64.getEncoder().encodeToString(pdfBytes);
 
@@ -50,7 +48,6 @@ public class PaymentService {
                     .boletoPdfBase64(base64Pdf)
                     .createdAt(LocalDateTime.now())
                     .build();
-
         } else {
             throw new RuntimeException("Método de pagamento inválido");
         }

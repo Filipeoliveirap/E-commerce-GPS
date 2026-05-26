@@ -1,13 +1,12 @@
 package com.backend.infrastructure.repository;
 
 import com.backend.infrastructure.model.Address;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface AddressRepository extends MongoRepository<Address, String> {
-    List<Address> findByUserId(String userId);
-    Optional<Address> findByIdAndUserId(String id, String userId);
-
+public interface AddressRepository extends JpaRepository<Address, Long> {
+    List<Address> findByUserId(Long userId);
+    Optional<Address> findByIdAndUserId(Long id, Long userId);
 }

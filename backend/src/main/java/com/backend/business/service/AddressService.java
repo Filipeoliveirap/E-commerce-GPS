@@ -25,7 +25,7 @@ public class AddressService {
         User user = userRepository.findByEmail(emailUsuarioLogado)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        if (addressRepository.findByUserId(user.getId()).isPresent()) {
+        if (addressRepository.findByUserId(user.getId()).isEmpty()) {
             throw new IllegalArgumentException("Usuário já possui endereço cadastrado");
         }
 
@@ -39,7 +39,7 @@ public class AddressService {
     public boolean userHasAddress(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        return addressRepository.findByUserId(user.getId()).isPresent();
+        return addressRepository.findByUserId(user.getId()).isEmpty();
     }
 
     public List<AddressResponseDTO> getUserAddresses(String email) {

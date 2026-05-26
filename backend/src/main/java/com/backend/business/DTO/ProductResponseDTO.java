@@ -11,7 +11,7 @@ import lombok.Builder;
 @AllArgsConstructor
 public class ProductResponseDTO {
 
-    private String id;
+    private Long id;
 
     private String name;
 

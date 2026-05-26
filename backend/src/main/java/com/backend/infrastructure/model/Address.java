@@ -1,27 +1,31 @@
 package com.backend.infrastructure.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Document(collection = "address")
+@Entity
+@Table(name = "address")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Address {
+
     @Id
-    private String id;
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_id")
+    private Long userId;
+
     private String street;
     private String number;
     private String complement;
     private String neighborhood;
     private String city;
     private String state;
+
+    @Column(name = "zip_code")
     private String zipCode;
 
     public String getFullAddress() {

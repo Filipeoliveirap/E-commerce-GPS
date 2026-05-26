@@ -1,16 +1,13 @@
 package com.backend.infrastructure.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Document(collection = "orders")
+@Entity
+@Table(name = "orders")
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,23 +15,32 @@ import java.util.List;
 public class Order {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String userId;
+    @Column(name = "user_id")
+    private Long userId;
 
+    @Column(name = "user_name")
     private String userName;
 
+    @Column(name = "customer_name")
     private String customerName;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
     private List<OrderItem> items;
 
+    @Column(name = "total_amount")
     private Double totalAmount;
 
     private String status;
 
-    private String addressId;
+    @Column(name = "address_id")
+    private Long addressId;
 
     private String address;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }
