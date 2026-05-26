@@ -1,10 +1,10 @@
 package com.backend.infrastructure.model;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "products")
+@Entity
+@Table(name = "products")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,13 +13,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Product {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private Double price;
+
+    @Column(name = "original_price")
     private Double originalPrice;
+
     private String image;
     private String category;
+
+    @Column(name = "in_stock")
     private Boolean inStock;
 }
