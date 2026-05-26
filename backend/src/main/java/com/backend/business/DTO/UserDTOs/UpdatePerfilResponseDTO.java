@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdatePerfilResponseDTO {
-    private String id;
+    private Long id;
     private String name;
     private String email;
     private String password;

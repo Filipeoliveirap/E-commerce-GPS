@@ -22,22 +22,18 @@ public class ProductService {
 
     private final ProductRepository repository;
 
-
-
-    public ProductDTO findById(String id) {
-    Product product = repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-    return ProductMapper.toDTO(product);
+    public ProductDTO findById(Long id) {
+        Product product = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        return ProductMapper.toDTO(product);
     }
 
-    
     public List<ProductDTO> findAll() {
         return repository.findAll()
                 .stream()
                 .map(ProductMapper::toDTO)
                 .toList();
     }
-
 
     public ProductResponseDTO create(ProductCreateDTO dto) {
         Product product = ProductMapper.toEntity(dto);
@@ -46,8 +42,7 @@ public class ProductService {
         return ProductMapper.toResponseDTO(saved);
     }
 
-
-    public ProductResponseDTO update(String id, ProductUpdateDTO dto) {
+    public ProductResponseDTO update(Long id, ProductUpdateDTO dto) {
         Product product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
@@ -59,33 +54,26 @@ public class ProductService {
         product.setCategory(dto.getCategory());
         product.setInStock(dto.getInStock());
 
-        Product updated = repository.save(product);
-
-        return ProductMapper.toResponseDTO(updated);
+        return ProductMapper.toResponseDTO(repository.save(product));
     }
 
-    public void delete(String id) {
-    Product product = repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-    repository.delete(product);
+    public void delete(Long id) {
+        Product product = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        repository.delete(product);
     }
 
     public List<ProductDTO> findByCategory(String category) {
         return repository.findByCategory(category)
-            .stream()
-            .map(ProductMapper::toDTO)
-            .toList();
+                .stream()
+                .map(ProductMapper::toDTO)
+                .toList();
     }
 
     public PageResponseDTO<ProductResponseDTO> findAllPaged(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-
         Page<Product> productPage = repository.findAll(pageable);
-
-        Page<ProductResponseDTO> dtoPage =
-                productPage.map(ProductMapper::toResponseDTO);
-
+        Page<ProductResponseDTO> dtoPage = productPage.map(ProductMapper::toResponseDTO);
         return PageMapper.toDTO(dtoPage);
     }
-
 }

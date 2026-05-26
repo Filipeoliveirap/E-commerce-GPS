@@ -13,7 +13,7 @@ public class CheckoutService {
     private final PaymentService paymentService;
 
     public CheckoutResponseDTO checkout(String email, CheckoutRequestDTO dto) {
-        String orderId = orderService.createOrder(email, dto);
+        Long orderId = orderService.createOrder(email, dto);
 
         return paymentService.generatePayment(orderId, dto.getPaymentMethod());
     }

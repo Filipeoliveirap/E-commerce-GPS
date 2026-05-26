@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AddressMapper {
 
-    public Address toEntity(CreateAddressRequestDTO dto, String userId) {
+    public Address toEntity(CreateAddressRequestDTO dto, Long userId) {
         return Address.builder()
                 .userId(userId)
                 .street(dto.getStreet())
