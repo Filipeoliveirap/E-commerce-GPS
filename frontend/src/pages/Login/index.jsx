@@ -54,7 +54,11 @@ export default function Login() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      const success = await handleLogin(formData.email, formData.password);
+      const success = await handleLogin(
+        formData.email,
+        formData.password,
+        formData.rememberMe,
+      );
       if (success) {
         navigate("/produtos");
       } else if (loginError) {
@@ -97,7 +101,7 @@ export default function Login() {
                 Bem-vindo de volta!
               </h2>
               <p className="text-gray-300 text-sm leading-relaxed">
-                Acesse sua conta na A.J.F. Eletrônicos para acompanhar seus
+                Acesse sua conta na TechWave Eletrônicos para acompanhar seus
                 pedidos, verificar seus pontos de fidelidade e aproveitar
                 ofertas exclusivas.
               </p>
@@ -108,20 +112,24 @@ export default function Login() {
           <div className="w-full md:w-3/5 p-8 md:p-12 flex flex-col justify-center">
             <div className="mb-8">
               <h3 className="text-2xl font-bold text-navy-900 dark:text-white mb-2">
-                Login A.J.F.
+                Login TechWave Eletrônicos.
               </h3>
               <p className="text-navy-700 dark:text-gray-400 text-sm">
                 Insira suas credenciais para acessar sua conta.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
               <Input
                 label="E-mail"
-                icon="alternate_email"
+                icon="mail"
                 name="email"
                 type="text"
                 placeholder="seu@email.com"
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 value={formData.email}
                 onChange={handleInputChange}
                 error={errors.email}
@@ -133,6 +141,7 @@ export default function Login() {
                 name="password"
                 placeholder="Sua senha"
                 type={showPassword ? "text" : "password"}
+                autoComplete="off"
                 value={formData.password}
                 onChange={handleInputChange}
                 error={errors.password}
@@ -204,7 +213,7 @@ export default function Login() {
 
         <div className="absolute bottom-4 text-center w-full pointer-events-none">
           <p className="text-[10px] text-navy-700/40 dark:text-white/20">
-            © 2024 A.J.F. Eletrônicos - Atividade Acadêmica
+            © 2024 TechWave Eletrônicos - Atividade Acadêmica
           </p>
         </div>
       </main>

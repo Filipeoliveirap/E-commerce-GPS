@@ -8,6 +8,22 @@ export default function Input({
   trailing = null,
   ...props
 }) {
+  const handleInputChange = (event) => {
+    if (!onChange) return;
+
+    const inputType = props.type ?? "text";
+    const shouldTrimLeadingSpace = ["text", "email", "password", "search", "tel", "url"].includes(inputType);
+
+    if (shouldTrimLeadingSpace && typeof event.target?.value === "string") {
+      const sanitizedValue = event.target.value.replace(/^\s+/, "");
+      if (sanitizedValue !== event.target.value) {
+        event.target.value = sanitizedValue;
+      }
+    }
+
+    onChange(event);
+  };
+
   return (
     <div className="space-y-1.5">
       {label && (
@@ -18,28 +34,27 @@ export default function Input({
       
       <div className="relative">
         {icon && (
-          <span className="material-symbols-outlined absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-[20px] pointer-events-none">
+          <span className="ajf-input-icon material-symbols-outlined absolute inset-y-0 left-0 w-12 flex items-center justify-center text-gray-400 text-[20px] pointer-events-none">
             {icon}
           </span>
         )}
 
         <input
           className={`
-            block w-full rounded-full border
-            ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-navy-700 focus:ring-primary'}
-            bg-gray-50 dark:bg-navy-900
-            py-3 ${icon ? 'pl-10' : 'pl-4'} ${trailing ? 'pr-10' : 'pr-4'}
-            text-navy-900 dark:text-white
+            ajf-form-input ${icon ? 'has-leading-icon' : ''} block w-full rounded-full border
+            ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-300 focus:ring-primary'}
+            bg-gray-50 dark:bg-gray-100
+            py-3 ${icon ? 'pl-14' : 'pl-4'} ${trailing ? 'pr-10' : 'pr-4'}
+            text-navy-900 dark:text-navy-900
             placeholder-gray-400
             focus:border-primary focus:bg-white
-            dark:focus:bg-navy-800
             focus:ring-1
             sm:text-sm
             transition-all outline-none
           `}
           name={name}
           value={value}
-          onChange={onChange}
+          onChange={handleInputChange}
           {...props}
         />
 

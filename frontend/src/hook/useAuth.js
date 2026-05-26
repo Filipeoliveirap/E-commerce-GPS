@@ -10,15 +10,14 @@ export function useAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  async function handleLogin(email, password) {
+  async function handleLogin(email, password, rememberMe = false) {
     try {
       setLoading(true);
       setError(null);
 
-      const { token, name } = await loginUser({ email, password });
-      const firstName = name.split(" ")[0];
-
-      login({ name }, token);
+      const { token, user } = await loginUser({ email, password });
+      const firstName = (user?.name || "Usuário").split(" ")[0];
+      login(user, token, rememberMe);
       toast.success(`Bem-vindo de volta, ${firstName}!`);
       return true;
     } catch (err) {
@@ -42,7 +41,7 @@ export function useAuth() {
       };
 
       const response = await registerUser(payload);
-      const firstName = response.name.split(" ")[0];
+      const firstName = (response.user?.name || "Novo Usuário").split(" ")[0];
 
       toast.success(
         `Bem-vindo(a), ${firstName}! Cadastro realizado com sucesso.`

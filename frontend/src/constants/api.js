@@ -9,3 +9,22 @@ export const UsersEndpoit = {
     CAMPOS_REAIS: "/api/users/reais",
     DELETE_ACCOUNT: "/api/users/conta",
 };
+
+export const ProductsEndpoint = {
+    GET_ALL: "/products",
+    GET_PAGED: "/products/paged",
+    GET_BY_ID: "/products/:id",
+    GET_BY_CATEGORY: "/products/category/:category",
+    CREATE: "/products",
+    UPDATE: "/products/:id",
+    DELETE: "/products/:id",
+};
+
+export const CheckoutEndpoint = {
+  CHECKOUT: "/api/checkout",
+};
+
+export const AddressEndpoint = {
+  CREATE: "/api/address",
+  FIND_ADDRESSES: "/api/address/has",
+};

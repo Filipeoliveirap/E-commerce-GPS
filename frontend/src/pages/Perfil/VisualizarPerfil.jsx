@@ -4,6 +4,7 @@ import { useProfile } from "../../hook/useProfile";
 import { MaskUtils } from "../../utils/maskUtils";
 import { validators } from "../../utils/validators";
 import DeleteAccountModal from "../../components/molecules/DeleteAccountModal/DeleteAccountModal";
+import { toast } from "react-toastify";
 
 export default function PerfilUsuario() {
   const {
@@ -14,6 +15,7 @@ export default function PerfilUsuario() {
     fetchCamposReais,
     camposReais,
     handleDeleteAccount,
+    handleLogout,
   } = useProfile();
 
   const [form, setForm] = useState({
@@ -23,17 +25,11 @@ export default function PerfilUsuario() {
     telephone: user?.telephone || "",
   });
 
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    cpf: "",
-    telephone: "",
-    password: "",
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const [newPassword, setNewPassword] = useState("");
   const [editando, setEditando] = useState({
     name: false,
     email: false,
@@ -41,35 +37,81 @@ export default function PerfilUsuario() {
     telephone: false,
     password: false,
   });
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
   // Sincroniza o form quando o user é carregado
   useEffect(() => {
     if (!user) return;
 
-    const updateForm = () => {
+    const loadData = async () => {
+      // Carrega os campos reais (sem máscara) do backend
+      await fetchCamposReais();
+
+      console.log("User data carregado:", user);
+      
       setForm({
         name: user.name || "",
         email: user.email || "",
-        cpf: user.cpf || "",
-        telephone: user.telephone || "",
+        cpf: user.cpf || "", // Vai ser preenchido com camposReais no próximo useEffect
+        telephone: user.telephone || "", // Vai ser preenchido com camposReais no próximo useEffect
       });
     };
 
-    setTimeout(updateForm, 0);
-  }, [user]);
+    loadData();
+  }, [user, fetchCamposReais]);
+
+  // Sincroniza o form quando camposReais mudar
+  useEffect(() => {
+    console.log("camposReais atualizados:", camposReais);
+    if (camposReais.cpf || camposReais.telephone || camposReais.email) {
+      console.log("Sincronizando form com camposReais");
+      setForm((prev) => ({
+        ...prev,
+        cpf: camposReais.cpf || prev.cpf,
+        telephone: camposReais.telephone || prev.telephone,
+        email: camposReais.email || prev.email,
+      }));
+    }
+  }, [camposReais]);
 
   // Alterna edição
   const toggleEdit = (campo) => {
-    setEditando((prev) => ({ ...prev, [campo]: !prev[campo] }));
+    setEditando((prev) => {
+      const novoEstado = !prev[campo];
 
-    setForm((prev) => ({
-      ...prev,
-      [campo]: prev[campo] || camposReais[campo] || user[campo],
-    }));
+      if (!novoEstado && campo === "password") {
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setMostrarSenha(false);
+      }
+
+      if (novoEstado) {
+        setForm((f) => ({
+          ...f,
+          [campo]: camposReais[campo] || user[campo] || "",
+        }));
+      }
+
+      return { ...prev, [campo]: novoEstado };
+    });
   };
 
+  // Função para aplicar máscara enquanto digita
+  const handleMaskInput = (campo, value) => {
+    let maskedValue = value.replace(/\D/g, ""); // Remove tudo que não é dígito
+
+    if (campo === "cpf") {
+      if (maskedValue.length > 11) maskedValue = maskedValue.slice(0, 11);
+    } else if (campo === "telephone") {
+      if (maskedValue.length > 11) maskedValue = maskedValue.slice(0, 11);
+    }
+
+    setForm({ ...form, [campo]: maskedValue });
+  };
   // Alterna visibilidade da senha
   const toggleMostrarSenha = () => setMostrarSenha((prev) => !prev);
 
@@ -83,7 +125,7 @@ export default function PerfilUsuario() {
     );
 
     if (camposEditados.length === 0) {
-      alert("Nenhuma alteração para salvar");
+      toast.warning("Nenhuma alteração para salvar");
       return;
     }
 
@@ -96,62 +138,92 @@ export default function PerfilUsuario() {
       switch (campo) {
         case "email":
           if (!validators.email(valor)) {
-            alert("E-mail inválido");
+            toast.warning("E-mail inválido");
             return;
           }
           break;
         case "name":
           if (!validators.name(valor)) {
-            alert("Nome inválido");
+            toast.warning("Nome inválido");
             return;
           }
           break;
         case "cpf":
           if (!validators.cpf(valor)) {
-            alert("CPF inválido");
+            toast.warning("CPF inválido");
             return;
           }
           break;
         case "telephone":
           if (!validators.phone(valor)) {
-            alert("Telefone inválido");
+            toast.warning("Telefone inválido");
             return;
           }
           break;
         default:
           break;
       }
-
-      formParaEnvio[campo] = valor;
     }
 
-    // Corrige campos mascarados (se não mudou, envia o real)
-    ["email", "cpf", "telephone"].forEach((campo) => {
-      if (!formParaEnvio[campo]) return;
-
-      if (
-        campo === "email" &&
-        formParaEnvio[campo] === MaskUtils.maskEmail(camposReais[campo])
-      ) {
-        formParaEnvio[campo] = camposReais[campo];
+    if (editando.email && form.email.trim()) {
+      if (!validators.email(form.email)) {
+        alert("E-mail inválido - use um domínio válido (gmail, hotmail, yahoo, outlook)");
+        return;
       }
+    }
 
-      if (
-        campo === "cpf" &&
-        formParaEnvio[campo] === MaskUtils.maskCpf(camposReais[campo])
-      ) {
-        formParaEnvio[campo] = camposReais[campo];
+    if (editando.cpf && form.cpf.trim()) {
+      const cpfLimpo = form.cpf.replace(/\D/g, "");
+      if (!validators.cpf(cpfLimpo)) {
+        alert("CPF inválido - deve ter 11 dígitos");
+        return;
       }
+    }
 
-      if (
-        campo === "telephone" &&
-        formParaEnvio[campo] === MaskUtils.maskTelephone(camposReais[campo])
-      ) {
-        formParaEnvio[campo] = camposReais[campo];
+    if (editando.telephone && form.telephone.trim()) {
+      const telefoneLimpo = form.telephone.replace(/\D/g, "");
+      if (!validators.phone(telefoneLimpo)) {
+        alert("Telefone inválido - deve ter 11 dígitos (DDD + número)");
+        return;
       }
-    });
+    }
 
-    // Envia somente o que mudou
+    if (editando.name) {
+      formParaEnvio.name = form.name.trim();
+    } else {
+      formParaEnvio.name = user.name;
+    }
+
+    if (editando.email) {
+      formParaEnvio.email = form.email.trim();
+    } else {
+      formParaEnvio.email = user.email;
+    }
+
+    if (editando.cpf) {
+      // Remove apenas dígitos não-numéricos
+      const cpfLimpo = String(form.cpf || "").replace(/[^\d]/g, "");
+      formParaEnvio.cpf = cpfLimpo;
+      console.log("CPF enviado (editado):", formParaEnvio.cpf, "length:", formParaEnvio.cpf.length);
+    }
+    // Se NÃO foi editado, NÃO envia CPF (evita conflito de duplicação)
+
+    if (editando.telephone) {
+      // Remove apenas dígitos não-numéricos
+      const telLimpo = String(form.telephone || "").replace(/[^\d]/g, "");
+      formParaEnvio.telephone = telLimpo;
+      console.log("Telephone enviado (editado):", formParaEnvio.telephone, "length:", formParaEnvio.telephone.length);
+    }
+    // Se NÃO foi editado, NÃO envia telefone (evita conflito de duplicação)
+    
+    console.log("=== DADOS FINAIS ENVIADOS ===");
+    console.log("Form atual:", form);
+    console.log("name:", formParaEnvio.name);
+    console.log("email:", formParaEnvio.email);
+    console.log("cpf:", formParaEnvio.cpf, "(esperado: 11 dígitos)");
+    console.log("telephone:", formParaEnvio.telephone, "(esperado: 11 dígitos)");
+    console.log("Object completo:", formParaEnvio);
+
     const sucesso = await handleUpdateProfile(formParaEnvio);
 
     if (sucesso) {
@@ -162,24 +234,53 @@ export default function PerfilUsuario() {
         telephone: false,
         password: false,
       });
-
-      setForm((prev) => ({ ...prev, ...formParaEnvio }));
+      // Recarrega o form com os novos valores
+      setForm({
+        name: formParaEnvio.name || "",
+        email: formParaEnvio.email || "",
+        cpf: formParaEnvio.cpf || "",
+        telephone: formParaEnvio.telephone || "",
+      });
     }
   };
 
   // Salva nova senha
   const handleSaveSenha = async () => {
-    if (!validators.password(newPassword)) {
-      alert("A senha deve ter no mínimo 6 caracteres");
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
+
+    if (!currentPassword) {
+      toast.warning("Informe a senha atual");
       return;
     }
 
-    const sucesso = await handleUpdatePassword(newPassword);
+    if (!validators.password(newPassword)) {
+      toast.warning("Nova senha deve ter no mínimo 6 caracteres");
+      return;
+    }
 
-    if (sucesso) {
-      setNewPassword("");
-      setEditando((prev) => ({ ...prev, password: false }));
-      setMostrarSenha(false);
+    if (newPassword !== confirmPassword) {
+      toast.warning("As senhas não coincidem");
+      return;
+    }
+
+    try {
+      const sucesso = await handleUpdatePassword({
+        currentPassword,
+        newPassword,
+      });
+
+      if (sucesso) {
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        setEditando((prev) => ({ ...prev, password: false }));
+        setMostrarSenha(false);
+      }
+    } catch {
+      // o hook já exibe o toast
     }
   };
 
@@ -211,56 +312,48 @@ export default function PerfilUsuario() {
           <div className="logo">
             <div className="logo-icon">⚡</div>
             <h2>
-              A.J.F. <span>Eletrônicos</span>
+              TechWave. <span>Eletrônicos</span>
             </h2>
           </div>
           <input className="search" placeholder="Buscar produtos..." />
           <div className="user-info">
             <img src="https://i.pravatar.cc/150" alt="Perfil" />
             <div>
-              <p className="user-name">{user?.name}</p>
+              <p className="user-name">{user?.name || "Usuário"}</p>
               <span>Minha Conta</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* MAIN */}
-      <main className="main">
-        <aside className="sidebar">
-          <h3>Painel</h3>
-          <p>Configurações da conta</p>
-          <ul>
-            <li className="active">Dados Pessoais</li>
-            <li>
-              <div style={{ marginTop: "20px" }}>
-                <p
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#999",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Zona de Perigo
-                </p>
-                <div
-                  className="delete-account"
-                  onClick={() => setShowDeleteModal(true)}
-                  style={{
-                    padding: "12px",
-                    cursor: "pointer",
-                    borderRadius: "6px",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  Deletar Minha Conta
-                </div>
-              </div>
-            </li>
-          </ul>
-        </aside>
+      {/* LOADING STATE */}
+      {loading && !user ? (
+        <main className="main">
+          <div style={{ padding: "40px", textAlign: "center", width: "100%" }}>
+            <p style={{ fontSize: "1.2rem", color: "#666" }}>Carregando dados...</p>
+          </div>
+        </main>
+      ) : !user ? (
+        <main className="main">
+          <div style={{ padding: "40px", textAlign: "center", width: "100%" }}>
+            <p style={{ fontSize: "1.2rem", color: "#666" }}>Você precisa estar logado para acessar essa página</p>
+          </div>
+        </main>
+      ) : (
+        <main className="main">
+          <aside className="sidebar">
+            <h3>Painel</h3>
+            <p>Configurações da conta</p>
+            <ul>
+              <li className="active">Dados Pessoais</li>
+              <li className="logout" onClick={handleLogout}>Sair da Conta</li>
+              <li className="delete-account" onClick={() => setShowDeleteModal(true)}>
+                Deletar Minha Conta
+              </li>
+            </ul>
+          </aside>
 
-        <section className="content">
+          <section className="content">
           <div className="content-header">
             <div>
               <h1>Dados Pessoais</h1>
@@ -269,7 +362,7 @@ export default function PerfilUsuario() {
             <button
               className="btn-save"
               onClick={handleSave}
-              disabled={loading || Object.values(errors).some((e) => e !== "")}
+              disabled={loading}
             >
               {loading ? "Atualizando..." : "Salvar Alterações"}
             </button>
@@ -284,48 +377,27 @@ export default function PerfilUsuario() {
                   <input
                     type={"text"}
                     value={
-                      mostrarCampo[campo.name] && camposReais[campo.name]
-                        ? camposReais[campo.name]
-                        : form[campo.name]
+                      editando[campo.name]
+                        ? form[campo.name] // Em edição: valor real
+                        : mostrarCampo[campo.name]
+                        ? form[campo.name] // Mostrando: valor real
+                        : campo.name === "cpf"
+                        ? MaskUtils.maskCpf(form[campo.name]) // Ocultado: máscara
+                        : campo.name === "telephone"
+                        ? MaskUtils.maskTelephone(form[campo.name]) // Ocultado: máscara
+                        : campo.name === "email"
+                        ? MaskUtils.maskEmail(form[campo.name]) // Ocultado: máscara
+                        : form[campo.name] // Nome não tem máscara
                     }
                     disabled={!editando[campo.name]}
                     onChange={(e) => {
-                      const valor = e.target.value.trimStart();
-
-                      // Atualiza o form
-                      setForm((prev) => ({ ...prev, [campo.name]: valor }));
-
-                      // Valida imediatamente
-                      let erro = "";
-                      switch (campo.name) {
-                        case "name":
-                          if (!validators.name(valor)) erro = "Nome inválido";
-                          break;
-                        case "email":
-                          if (!validators.email(valor)) erro = "Email inválido";
-                          break;
-                        case "cpf":
-                          if (!validators.cpf(valor)) erro = "CPF inválido";
-                          break;
-                        case "telephone":
-                          if (!validators.phone(valor))
-                            erro = "Telefone inválido";
-                          break;
-                        case "password":
-                          if (!validators.password(valor))
-                            erro = "Senha deve ter no mínimo 6 caracteres";
-                          break;
-                        default:
-                          break;
+                      if (campo.name === "cpf" || campo.name === "telephone") {
+                        handleMaskInput(campo.name, e.target.value);
+                      } else {
+                        setForm({ ...form, [campo.name]: e.target.value });
                       }
-                      setErrors((prev) => ({ ...prev, [campo.name]: erro }));
                     }}
                   />
-
-                  {errors[campo.name] && (
-                    <span className="error-message">{errors[campo.name]}</span>
-                  )}
-
                   {campo.name !== "name" && (
                     <button
                       type="button"
@@ -357,57 +429,100 @@ export default function PerfilUsuario() {
             {/* Senha */}
             <div className="form-group">
               <label>Senha</label>
+
               <div className="input-edit-wrapper">
                 <input
                   type={mostrarSenha ? "text" : "password"}
-                  value={newPassword}
+                  placeholder="Senha atual"
+                  value={passwordForm.currentPassword}
                   disabled={!editando.password}
-                  placeholder={
-                    editando.password ? "Digite uma nova senha" : "********"
+                  onChange={(e) =>
+                    setPasswordForm((p) => ({
+                      ...p,
+                      currentPassword: e.target.value,
+                    }))
                   }
-                  onChange={(e) => setNewPassword(e.target.value)}
                 />
-                <div className="btn-wrapper">
-                  {editando.password && (
-                    <>
-                      <button
-                        type="button"
-                        className="btn-edit"
-                        onClick={toggleMostrarSenha}
-                      >
-                        {mostrarSenha ? "Ocultar" : "Mostrar"}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-edit"
-                        onClick={() => toggleEdit("password")}
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-save"
-                        onClick={handleSaveSenha}
-                      >
-                        Salvar
-                      </button>
-                    </>
-                  )}
-                  {!editando.password && (
+              </div>
+
+              {editando.password && (
+                <>
+                  <div className="input-edit-wrapper">
+                    <input
+                      type={mostrarSenha ? "text" : "password"}
+                      placeholder="Nova senha"
+                      value={passwordForm.newPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          newPassword: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="input-edit-wrapper">
+                    <input
+                      type={mostrarSenha ? "text" : "password"}
+                      placeholder="Confirmar nova senha"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          confirmPassword: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="btn-wrapper">
+                {editando.password ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn-edit"
+                      onClick={toggleMostrarSenha}
+                    >
+                      {mostrarSenha ? "Ocultar" : "Mostrar"}
+                    </button>
+
                     <button
                       type="button"
                       className="btn-edit"
                       onClick={() => toggleEdit("password")}
                     >
-                      Editar
+                      Cancelar
                     </button>
-                  )}
-                </div>
+
+                    <button
+                      type="button"
+                      className="btn-save"
+                      onClick={handleSaveSenha}
+                    >
+                      Salvar
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn-edit"
+                    onClick={() => toggleEdit("password")}
+                  >
+                    Editar
+                  </button>
+                )}
               </div>
             </div>
           </form>
         </section>
-      </main>
+        </main>
+      )}
+
+      <footer className="footer">
+        <p>© 2024 TechWave Eletrônicos</p>
+      </footer>
 
       <DeleteAccountModal
         isOpen={showDeleteModal}
@@ -415,10 +530,6 @@ export default function PerfilUsuario() {
         onConfirm={handleDeleteAccount}
         loading={loading}
       />
-
-      <footer className="footer">
-        <p>© 2024 A.J.F. Eletrônicos</p>
-      </footer>
     </div>
   );
 }
